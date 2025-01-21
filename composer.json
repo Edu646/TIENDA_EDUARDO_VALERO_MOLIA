@@ -1,0 +1,24 @@
+{
+    "name": "asus/mi-tienda",
+    "autoload": {
+        "psr-4": {
+            "Asus\\MiTienda\\": "src/",
+            "Controllers\\": "./src/Controllers",
+            "Models\\": "./src/Models",
+            "Lib\\": "./src/Lib",
+            "Views\\": "./src/Views",
+            "Repositories\\": "./src/Repositories",
+            "Services\\": "./src/Services",
+            "Routes\\": "./src/Routes"
+        }
+    },
+    "authors": [
+        {
+            "name": "Eduardo Valero",
+            "email": "evaleromolina@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
