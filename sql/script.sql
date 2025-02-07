@@ -3,7 +3,6 @@ SET NAMES UTF8;
 CREATE DATABASE IF NOT EXISTS tienda;
 USE tienda;
 
-
 -- ...existing code...
 DROP TABLE IF EXISTS usuarios;
 CREATE TABLE IF NOT EXISTS usuarios( 

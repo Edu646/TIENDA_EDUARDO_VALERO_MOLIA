@@ -66,63 +66,6 @@ class UserService
         return $user;
     }
 
-    /**
-     * Busca un usuario por su ID.
-     *
-     * @param int $id ID del usuario a buscar
-     * @return User|null Devuelve el usuario si existe, de lo contrario, null
-     */
-    public function findUserById(int $id): ?User
-    {
-        return $this->userRepository->findById($id);
-    }
-
-    /**
-     * Actualiza la información de un usuario.
-     *
-     * @param User $user Instancia del usuario con la información actualizada
-     * @return bool
-     * @throws \Exception Si ocurre un error durante la actualización
-     */
-    public function updateUser(User $user): bool
-    {
-        // Verificar si el usuario existe
-        $existingUser = $this->userRepository->findById($user->getId());
-        if ($existingUser === null) {
-            throw new \Exception('El usuario no existe.');
-        }
-
-        // Actualizar el usuario
-        $result = $this->userRepository->update($user);
-        if (!$result) {
-            throw new \Exception('Error al actualizar el usuario. Inténtalo de nuevo.');
-        }
-
-        return true;
-    }
-
-    /**
-     * Elimina un usuario por su ID.
-     *
-     * @param int $id ID del usuario a eliminar
-     * @return bool
-     * @throws \Exception Si ocurre un error durante la eliminación
-     */
-    public function deleteUser(int $id): bool
-    {
-        // Verificar si el usuario existe
-        $existingUser = $this->userRepository->findById($id);
-        if ($existingUser === null) {
-            throw new \Exception('El usuario no existe.');
-        }
-
-        // Eliminar el usuario
-        $result = $this->userRepository->delete($id);
-        if (!$result) {
-            throw new \Exception('Error al eliminar el usuario. Inténtalo de nuevo.');
-        }
-
-        return true;
-    }
+ 
 }
 ?>

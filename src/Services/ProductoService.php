@@ -20,5 +20,11 @@ class ProductoService {
     public function getAllProductos()
     {
         return $this->productoRepository->findAll();
+ 
+ 
+    }
+
+    public function deleteProducto($producto_id) {
+        return $this->productoRepository->deleteProductoById($producto_id);
     }
 }

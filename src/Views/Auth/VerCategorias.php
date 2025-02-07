@@ -1,5 +1,5 @@
 <?php
-session_start(); // Inicia la sesión para usar $_SESSION
+
 
 // Verificar si el carrito ya existe, si no, crear uno
 if (!isset($_SESSION['carrito'])) {
@@ -36,89 +36,126 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['producto_id'])) {
     <title>Ver Categorías</title>
     <style>
         /* Estilos mejorados */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
+        /* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    text-align: center;
+}
 
-        #title {
-            text-align: center;
-            color: #444;
-            margin: 20px 0;
-            font-size: 2em;
-        }
+/* Título principal */
+#title {
+    font-size: 2.5em;
+    color: #222;
+    margin-top: 20px;
+}
 
-        .cat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0;
-            margin: 0;
-        }
+/* Contenedor de categorías */
+.cat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    margin: 20px auto;
+    max-width: 800px;
+}
 
-        .cat li {
-            background: #ffffff;
-            width: 90%;
-            max-width: 600px;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Tarjeta de cada categoría */
+.cat li {
+    background: #ffffff;
+    width: 100%;
+    margin: 10px 0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .cat li a {
-            display: inline-block;
-            margin-top: 10px;
-            text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
+.cat li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
 
-        .cat li a:hover {
-            color: #0056b3;
-        }
+/* Nombre de la categoría */
+.cat li h2 {
+    font-size: 1.8em;
+    color: #007BFF;
+}
 
-        .productos {
-            width: 100%;
-            margin-top: 20px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
+/* Productos dentro de cada categoría */
+.productos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
 
-        .productos p {
-            margin: 5px 0;
-        }
+/* Tarjeta de cada producto */
+.productos div {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 220px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
 
-        .productos img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+.productos div:hover {
+    transform: scale(1.05);
+}
 
-        button {
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 10px;
-        }
+/* Imagen del producto */
+.productos img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-        button:hover {
-            background-color: #0056b3;
-        }
+/* Texto de los productos */
+.productos p {
+    margin: 5px 0;
+    font-size: 1em;
+}
+
+/* Botón para añadir al carrito */
+button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 600px) {
+    .cat {
+        max-width: 95%;
+    }
+    
+    .productos {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .productos div {
+        width: 90%;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -162,28 +199,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['producto_id'])) {
             $sqlProductos = "SELECT id, nombre, precio, stock, oferta, imagen FROM productos WHERE categoria_id = :idCategoria";
             $stmtProductos = $pdo->prepare($sqlProductos);
             $stmtProductos->execute(['idCategoria' => $idCategoria]);
-
+        
             if ($stmtProductos->rowCount() > 0) {
                 while ($producto = $stmtProductos->fetch(PDO::FETCH_ASSOC)) {
-                    echo '<div>';
-                    echo '<img src="' . $producto['imagen'] . '" alt="' . $producto['nombre'] . '">';
-                    echo '<p>' . htmlspecialchars($producto['nombre']) . '</p>';
+                    echo '<div class="producto-card">'; // Asegura que cada producto está en su propia tarjeta
+                    echo '<img src="' . htmlspecialchars($producto['imagen']) . '" alt="' . htmlspecialchars($producto['nombre']) . '">';
+                    echo '<p><strong>' . htmlspecialchars($producto['nombre']) . '</strong></p>';
                     echo '<p>Precio: $' . htmlspecialchars($producto['precio']) . '</p>';
                     echo '<p>Stock: ' . htmlspecialchars($producto['stock']) . '</p>';
                     echo '<p>Oferta: ' . (htmlspecialchars($producto['oferta']) ? 'Sí' : 'No') . '</p>';
-
-                    // Formulario para agregar al carrito
-                    echo '<form method="POST" action="">
-                            <input type="hidden" name="producto_id" value="' . $producto['id'] . '">
-                            <input type="number" name="cantidad" value="1" min="1">
-                            <button type="submit">Agregar al Carrito</button>
-                          </form>';
-                    echo '</div>';
+                    echo '</div>'; // Cierre de tarjeta
                 }
             } else {
                 echo '<p>No hay productos en esta categoría.</p>';
             }
         }
+        
         ?>
     </ul>
 </body>

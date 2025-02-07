@@ -32,6 +32,7 @@ class ComposerStaticInit5425ac30f4ae221dbc00b88738bf7dfc
         'P' => 
         array (
             'PhpOption\\' => 10,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'M' => 
         array (
@@ -44,6 +45,10 @@ class ComposerStaticInit5425ac30f4ae221dbc00b88738bf7dfc
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
+        ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
         ),
         'D' => 
         array (
@@ -92,6 +97,10 @@ class ComposerStaticInit5425ac30f4ae221dbc00b88738bf7dfc
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'Models\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/Models',
@@ -103,6 +112,10 @@ class ComposerStaticInit5425ac30f4ae221dbc00b88738bf7dfc
         'GrahamCampbell\\ResultType\\' => 
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Dotenv\\' => 
         array (

@@ -6,150 +6,153 @@
     <title>Tiendilla</title>
     <style>
         /* Reset CSS */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    line-height: 1.6;
-}
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
 
-header {
-    background: #333;
-    color: #fff;
-    padding: 10px 0;
-    text-align: center;
-}
+        header {
+            background: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
 
-header h1 {
-    margin: 0;
-    font-size: 2em;
-}
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
 
-nav ul {
-    list-style: none;
-    padding: 0;
-}
+        nav ul {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
 
-nav ul li {
-    display: inline;
-    margin: 0 10px;
-}
+        nav ul li {
+            display: inline-block;
+            margin: 0 10px;
+        }
 
-nav ul li a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-}
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-nav ul li a:hover {
-    text-decoration: underline;
-}
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
 
-.container {
-    width: 80%;
-    margin: 20px auto;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
 
-.product {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 20px;
-}
+        .admin-section {
+            background-color: #222;
+            color: #fff;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
 
-.product img {
-    max-width: 300px;
-    height: auto;
-    margin-right: 20px;
-}
+        .admin-section h2 {
+            margin-bottom: 10px;
+        }
 
-.product-details {
-    flex: 1;
-}
+        .admin-section ul {
+            list-style: none;
+            padding: 0;
+        }
 
-.product-details h2 {
-    margin-top: 0;
-}
+        .admin-section ul li {
+            display: inline-block;
+            margin: 0 10px;
+        }
 
-.product-details p {
-    margin: 5px 0;
-}
+        .admin-section ul li a {
+            color: #ffcc00;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
+        .admin-section ul li a:hover {
+            text-decoration: underline;
+        }
 
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
+        footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
 
-th {
-    background-color: #f2f2f2;
-}
-
-tr:hover {
-    background-color: #f5f5f5;
-}
-
-footer {
-    background: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-@media (max-width: 768px) {
-    .product {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .product img {
-        margin: 0 0 20px 0;
-    }
-
-    nav ul li {
-        display: block;
-        margin: 10px 0;
-    }
-}
+        @media (max-width: 768px) {
+            nav ul li, .admin-section ul li {
+                display: block;
+                margin: 10px 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Bienvenido a Tiendilla</h1>
-        <nav>
+
+<header>
+    <h1>Bienvenido a Tiendilla</h1>
+    <nav>
+        <ul>
+            <?php if (isset($_SESSION['user'])): ?>
+                <!-- Opciones para usuario autenticado -->
+                <li>Bienvenido, <strong><?= htmlspecialchars($_SESSION['user']['nombre']) ?></strong></li>
+                <li><a href="<?= BASE_URL ?>logout">Cerrar Sesión</a></li>
+                <li><a href="<?= BASE_URL ?>ver">Lista Categorías</a></li>
+                <li><a href="<?= BASE_URL ?>verP">Lista de Productos</a></li>
+                <li><a href="<?= BASE_URL ?>carrito">Carrito</a></li>
+
+            <?php else: ?>
+                <!-- Opciones para usuarios no autenticados -->
+                <li><a href="<?= BASE_URL ?>">Inicio</a></li>
+                <li><a href="<?= BASE_URL ?>login">Iniciar Sesión</a></li>
+                <li><a href="<?= BASE_URL ?>register">Registrarse</a></li>
+                <li><a href="<?= BASE_URL ?>vista">Categorías</a></li>
+                <li><a href="<?= BASE_URL ?>verP">Lista de Productos</a></li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</header>
+
+<div class="container">
+    <!-- Sección especial para administradores -->
+    <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol'] === 'admin'): ?>
+        <div class="admin-section">
+            <h2>Panel de Administración</h2>
             <ul>
-                <?php if (isset($_SESSION['user'])): ?>
-                    <li>Bienvenido, <strong><?= htmlspecialchars($_SESSION['user']['nombre']) ?></strong></li>
-                    <li><a href="<?= BASE_URL ?>logout">Cerrar Sesión</a></li>
-                    <li><a href="<?= BASE_URL ?>ver">ListaCat</a></li>
-                    <li><a href="<?= BASE_URL ?>verP">ListaP</a></li>
-                    <li><a href="<?= BASE_URL ?>carrito">carro</a></li>
-                <?php else: ?>
-                    <li><a href="<?= BASE_URL ?>">Inicio</a></li>
-                    <li><a href="<?= BASE_URL ?>login">Iniciar Sesión</a></li>
-                    <li><a href="<?= BASE_URL ?>register">Registrarse</a></li>
-                    <li><a href="<?= BASE_URL ?>vista">Categotias</a></li>
-                    <li><a href="<?= BASE_URL ?>CrearP">CrearPro</a></li>
-                <?php endif; ?>
+                <li><a href="<?= BASE_URL ?>listus">Gestionar Usuarios</a></li>
+                <li><a href="<?= BASE_URL ?>CrearP">Gestionar Productos</a></li>
+                <li><a href="<?= BASE_URL ?>verP_admin">verProductos_admin</a></li>
             </ul>
-        </nav>
-    </header>
+        </div>
+    <?php endif; ?>
+</div>
+
+<footer>
+    <p>&copy; 2025 Tiendilla. Todos los derechos reservados.</p>
+</footer>
+
+</body>
+</html>

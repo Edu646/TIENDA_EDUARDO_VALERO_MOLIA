@@ -50,6 +50,28 @@ class Routes {
             (new AuthController())->processLogin();
         });
 
+        Router::add('GET', '/listus', function () {
+            (new AuthController())->listUsers();
+        });
+
+        Router::add('GET', '/edit/{id}', function ($id) {
+            (new AuthController())->editUser($id);
+        });
+
+        Router::add('POST', '/edit', function ($id) {
+            (new AuthController())->editUser($id);
+        });
+        
+        Router::add('POST', '/AddUs', function () {
+            (new AuthController())->addUser();
+        });
+
+        Router::add('POST', '/DelUs/{id}', function ($id) {
+            (new AuthController())->deleteUser($id);
+        });
+       
+        
+
         // logout
         Router::add('GET', 'logout', function () {
             error_log("Checkpoint: Ruta GET /logout ejecutada");
@@ -95,6 +117,14 @@ class Routes {
 
         Router::add('GET', '/verP', function () {
             (new ProductoController())->verProductos();
+        });
+
+        Router::add('GET', '/verP_admin', function () {
+            (new ProductoController())->verProductos_admin();
+        });
+
+        Router::add('POST', '/verP_admin', function () {
+            (new ProductoController())->eliminarProducto();
         });
         
         Router::add('GET', '/carrito', function () {

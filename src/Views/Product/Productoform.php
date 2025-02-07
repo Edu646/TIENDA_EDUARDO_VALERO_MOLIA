@@ -4,9 +4,57 @@
     <meta charset="UTF-8">
     <title>Añadir Producto</title>
 </head>
+
+<style>
+
+
+
+.form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 10 em;
+}
+
+.form-container h1 {
+    text-align: center;
+    color: #333;
+}
+
+.form-container label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.form-container input, 
+.form-container textarea, 
+.form-container button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-container button {
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.form-container button:hover {
+    background-color: #218838;
+}
+
+
+</style>
 <body>
     <h1>Añadir Producto</h1>
-    <form action="CrearP" method="POST" enctype="multipart/form-data">
+    <form   class="form-container"   action="CrearP" method="POST" enctype="multipart/form-data">
         <label for="nombre">Nombre del Producto:</label>
         <input type="text" id="nombre" name="nombre" required><br>
 

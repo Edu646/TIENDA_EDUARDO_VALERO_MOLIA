@@ -28,40 +28,50 @@ class ProductoController {
 
     public function addProducto() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nombre = $_POST['nombre'] ?? null;
-            $categoria_id = $_POST['categoria_id'] ?? null;
-            $descripcion = $_POST['descripcion'] ?? null;
-            $precio = $_POST['precio'] ?? null;
-            $stock = $_POST['stock'] ?? null;
-            $oferta = $_POST['oferta'] ?? null;
-            $fecha = $_POST['fecha'] ?? null;
-            $imagen = null;
+            $nombre = $_POST['nombre'] ?? '';
+            $categoria_id = $_POST['categoria_id'] ?? '';
+            $descripcion = $_POST['descripcion'] ?? '';
+            $precio = $_POST['precio'] ?? '';
+            $stock = $_POST['stock'] ?? '';
+            $oferta = $_POST['oferta'] ?? '';
+            $fecha = $_POST['fecha'] ?? '';
+            $imagen = '';
 
             // Manejar la subida de la imagen
-            if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            if (!empty($_FILES['imagen']['name']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = 'uploads/';
+                
+                // Verificar y crear la carpeta si no existe
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                
                 $uploadFile = $uploadDir . basename($_FILES['imagen']['name']);
                 if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadFile)) {
                     $imagen = $uploadFile;
                 } else {
-                    echo 'Error al subir la imagen';
-                    return;
+                    error_log('Error al mover el archivo: ' . $_FILES['imagen']['error']);
+                    header('Location: /error');
+                    exit;
                 }
             } else {
-                $imagen = $_POST['imagen_url'] ?? null;
+                $imagen = $_POST['imagen_url'] ?? '';
             }
 
-            if ($nombre) {
+            if (!empty($nombre)) {
                 $producto = new \Models\Producto($nombre, null, $categoria_id, $descripcion, $precio, $stock, $oferta, $fecha, $imagen);
                 $result = $this->productoService->addProducto($producto);
 
                 if ($result) {
-                    echo 'Producto añadido con éxito';
+                    header('Location: ' . BASE_URL );
+                    exit;
                 } else {
-                    echo 'Error al añadir el producto';
+                    header('Location: /error');
+                    exit;
                 }
             } else {
-                echo 'Nombre del producto es requerido';
+                header('Location: /error');
+                exit;
             }
         } else {
             $this->pages->render('Product/Productoform');
@@ -71,5 +81,26 @@ class ProductoController {
     public function verProductos() {
         $productos = $this->productoService->getAllProductos();
         $this->pages->render('Product/VerProductos', ['productos' => $productos]);
+    }
+
+    public function verProductos_admin() {
+        $productos = $this->productoService->getAllProductos();
+        $this->pages->render('Product/VerProductos_admin', ['productos' => $productos]);
+    }
+
+    public function eliminarProducto() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
+            $producto_id = $_POST['producto_id'];
+            
+            $result = $this->productoService->deleteProducto($producto_id);
+            
+            if ($result) {
+                header('Location: ' . BASE_URL );
+                exit;
+            } else {
+                header('Location: /error');
+                exit;
+            }
+        }
     }
 }

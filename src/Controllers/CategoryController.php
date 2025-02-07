@@ -12,6 +12,7 @@ class CategoryController
 {
     private $categoryService;
     private $pages;
+    private $carrito = [];
 
     public function __construct()
     {
@@ -62,5 +63,18 @@ class CategoryController
         error_log("Checkpoint: Entrando al método verCategorias");
         $categorias = $this->categoryService->getAllCategories();
         $this->pages->render('Auth/verCategorias', ['categorias' => $categorias]);
+    }
+
+    public function añadirProducto()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $producto = $_POST['producto'] ?? '';
+            if (!empty($producto)) {
+                $this->carrito[] = $producto;
+                echo "Producto añadido al carrito.";
+            } else {
+                echo "Error: No se ha especificado un producto.";
+            }
+        }
     }
 }
