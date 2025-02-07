@@ -103,10 +103,9 @@ class ProductoController {
             if ($producto) {
                 // Verificar si la cantidad solicitada no excede el stock disponible
                 if ($cantidad > $producto->getStock()) {
-                    // Si la cantidad es mayor que el stock, mostrar un mensaje de error
-                    $_SESSION['error'] = "No hay suficiente stock disponible. Stock actual: " . $producto->getStock();
-                    header('Location: ' . BASE_URL . '/carrito');
-                    exit;
+                    // Si la cantidad es mayor que el stock, establecer la cantidad máxima disponible
+                    $cantidad = $producto->getStock();
+                    $_SESSION['error'] = "No hay suficiente stock disponible. Se agregará la cantidad máxima disponible: " . $cantidad . " unidades.";
                 }
     
                 // Si la sesión del carrito no está iniciada, iniciarla
@@ -119,13 +118,14 @@ class ProductoController {
                 foreach ($_SESSION['carrito'] as &$item) {
                     if ($item['producto_id'] == $producto_id) {
                         // Si el producto ya existe en el carrito, actualizamos la cantidad
-                        if ($item['cantidad'] + $cantidad > $producto->getStock()) {
-                            // Verificar que la nueva cantidad no exceda el stock
-                            $_SESSION['error'] = "No puedes agregar más de " . $producto->getStock() . " unidades de este producto.";
-                            header('Location: ' . BASE_URL . '/carrito');
-                            exit;
+                        $nuevaCantidad = $item['cantidad'] + $cantidad;
+    
+                        // Asegurarse de que la cantidad no exceda el stock
+                        if ($nuevaCantidad > $producto->getStock()) {
+                            $nuevaCantidad = $producto->getStock();
+                            $_SESSION['error'] = "No puedes agregar más de " . $producto->getStock() . " unidades de este producto. Se ajustará la cantidad.";
                         }
-                        $item['cantidad'] += $cantidad;
+                        $item['cantidad'] = $nuevaCantidad;
                         $productoExistente = true;
                         break;
                     }
@@ -139,6 +139,7 @@ class ProductoController {
                         'precio' => $producto->getPrecio(),
                         'cantidad' => $cantidad,
                         'imagen' => $producto->getImagen(),
+                        'stock' => $producto->getStock(),
                     ];
                 }
     
@@ -153,58 +154,9 @@ class ProductoController {
         exit;
     }
     
-    public function aumentarCantidad() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
-            $producto_id = $_POST['producto_id'];
-            $cantidad = $_POST['cantidad'] ?? 1;
+
     
-            // Buscar el producto en el carrito
-            foreach ($_SESSION['carrito'] as &$item) {
-                if ($item['producto_id'] == $producto_id) {
-                    $producto = $this->productoService->getProductoById($producto_id);
-    
-                    // Verificar si hay stock suficiente
-                    if ($producto && $item['cantidad'] + $cantidad <= $producto->getStock()) {
-                        $item['cantidad'] += $cantidad;
-                        header('Location: ' . BASE_URL . '/carrito');
-                        exit;
-                    } else {
-                        $_SESSION['error'] = "No hay suficiente stock disponible.";
-                        header('Location: ' . BASE_URL . '/carrito');
-                        exit;
-                    }
-                }
-            }
-        }
-    
-        header('Location: /error');
-        exit;
-    }
-    
-    public function disminuirCantidad() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
-            $producto_id = $_POST['producto_id'];
-    
-            // Buscar el producto en el carrito
-            foreach ($_SESSION['carrito'] as &$item) {
-                if ($item['producto_id'] == $producto_id) {
-                    if ($item['cantidad'] > 1) {
-                        $item['cantidad'] -= 1;
-                        header('Location: ' . BASE_URL . '/carrito');
-                        exit;
-                    } else {
-                        // Si la cantidad es 1, no podemos disminuirla más
-                        $_SESSION['error'] = "La cantidad no puede ser menor a 1.";
-                        header('Location: ' . BASE_URL . '/carrito');
-                        exit;
-                    }
-                }
-            }
-        }
-    
-        header('Location: /error');
-        exit;
-    }
+
     
     
 

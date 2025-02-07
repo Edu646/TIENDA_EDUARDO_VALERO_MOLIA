@@ -163,11 +163,15 @@ button:hover {
                         <td><?= htmlspecialchars($usuario->getEmail()) ?></td>
                         <td><?= htmlspecialchars($usuario->getRol()) ?></td>
                         <td>
-                            <!-- Enlace de editar usuario -->
-                            <a href="<?= BASE_URL ?>editUser/<?= $usuario->getId() ?>">Editar</a>
-                            
-                            <!-- Enlace de eliminar usuario -->
-                            <a href="<?= BASE_URL ?>deleteUser/<?= $usuario->getId() ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">Eliminar</a>
+                            <!-- Formulario para editar usuario -->
+                            <form action="<?= BASE_URL ?>editUser/<?= $usuario->getId() ?>" method="GET" style="display:inline;">
+                                <button type="submit">Editar</button>
+                            </form>
+
+                            <!-- Formulario para eliminar usuario -->
+                            <form action="<?= BASE_URL ?>DelUs/<?= $usuario->getId() ?>" method="POST" style="display:inline;">
+                                <button type="submit" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>

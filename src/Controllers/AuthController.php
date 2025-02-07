@@ -115,72 +115,103 @@ class AuthController
     }
 
     // Función para editar un usuario
-    public function editUser($id)
-    {
-        error_log("Checkpoint: Editando usuario con ID $id");
+   // Función para editar un usuario
+public function editUser($id)
+{
+    error_log("Checkpoint: Editando usuario con ID $id");
+
+    // Verificar si el ID es válido antes de buscar el usuario
+    if ($id) {
+        // Buscar el usuario por ID
+        $usuario = $this->userRepository->findById($id);
+        
+        // Si el usuario no existe
+        if (!$usuario) {
+            $_SESSION['edit'] = 'fail';
+            $_SESSION['error'] = 'Usuario no encontrado.';
+            header('Location: ' . BASE_URL . 'list');
+            exit();
+        }
+
+        // Si el formulario fue enviado por POST, se actualizan los datos
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $userData = $_POST['data'];
+            $usuario->setNombre($userData['nombre']);
+            $usuario->setEmail($userData['email']);
+            $usuario->setRol($userData['role']);
+
+            // Validar los datos antes de actualizar
+            if ($usuario->validar()) {
+                try {
+                    // Actualizar el usuario en la base de datos
+                    $this->userRepository->update($usuario);
+                    $_SESSION['edit'] = 'success';
+                    error_log("Usuario editado exitosamente con ID " . $id);
+                    header('Location: ' . BASE_URL . 'list');
+                    exit();
+                } catch (\Exception $e) {
+                    $_SESSION['edit'] = 'fail';
+                    $_SESSION['error'] = $e->getMessage();
+                    error_log("Error al editar el usuario: " . $e->getMessage());
+                }
+            } else {
+                $_SESSION['edit'] = 'fail';
+                $_SESSION['errors'] = $usuario->getErrors();
+                error_log("Errores de validación en la edición de usuario: " . implode(", ", $usuario->getErrors()));
+            }
+        }
+
+        // Renderizar el formulario de edición
+        $this->pages->render('Auth/editForm', ['usuario' => $usuario]);
+    } else {
+        error_log("Error: El ID del usuario no es válido.");
+        $_SESSION['edit'] = 'fail';
+        $_SESSION['error'] = 'ID de usuario no válido.';
+        header('Location: ' . BASE_URL . 'list');
+        exit();
+    }
+}
+
+
     
-        // Verificar si el ID es válido antes de buscar el usuario
-        if ($id) {
+
+   // Función para eliminar un usuario
+public function deleteUser($id)
+{
+    error_log("Checkpoint: Eliminando usuario con ID $id");
+
+    // Verificar si el ID es válido antes de proceder
+    if ($id) {
+        try {
+            // Buscar el usuario en la base de datos por ID
             $usuario = $this->userRepository->findById($id);
             
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                $userData = $_POST['data'];
-                $usuario->setNombre($userData['nombre']);
-                $usuario->setEmail($userData['email']);
-                $usuario->setRol($userData['role']);
-                
-                // Validar y actualizar
-                if ($usuario->validar()) {
-                    try {
-                        $this->userRepository->update($usuario);
-                        $_SESSION['edit'] = 'success';
-                        header('Location: ' . BASE_URL . 'list');
-                        exit(); // Es importante que uses exit después de header para evitar continuar con el código.
-                    } catch (\Exception $e) {
-                        $_SESSION['edit'] = 'fail';
-                        $_SESSION['error'] = $e->getMessage();
-                        error_log("Error en editUser: " . $e->getMessage());
-                    }
-                } else {
-                    $_SESSION['edit'] = 'fail';
-                    $_SESSION['errors'] = $usuario->getErrors();
-                }
-            }
-    
-            // Renderizar formulario de edición
-            $this->pages->render('Auth/editForm', ['usuario' => $usuario]);
-        } else {
-            error_log("Error: El ID del usuario no es válido.");
-        }
-    }
-
-    
-
-    // Función para eliminar un usuario
-    public function deleteUser($id)
-    {
-        error_log("Checkpoint: Eliminando usuario con ID $id");
-    
-        try {
-            // Verificamos si el usuario existe antes de eliminar
-            $usuario = $this->userRepository->findById($id);
             if ($usuario) {
+                // Eliminar el usuario de la base de datos
                 $this->userRepository->delete($id);
                 $_SESSION['delete'] = 'success';
-                error_log("Usuario eliminado con éxito.");
+                error_log("Usuario eliminado exitosamente con ID " . $id);
             } else {
                 throw new \Exception("El usuario no existe.");
             }
         } catch (\Exception $e) {
             $_SESSION['delete'] = 'fail';
             $_SESSION['error'] = $e->getMessage();
-            error_log("Error en deleteUser: " . $e->getMessage());
+            error_log("Error al eliminar el usuario: " . $e->getMessage());
         }
-    
-        // Redirigimos a la lista de usuarios después de eliminar
-        header('Location: ' . BASE_URL );
-        exit(); // Usamos exit para evitar continuar con el código después de la redirección
+
+        // Redirigir a la lista de usuarios después de eliminar
+        header('Location: ' . BASE_URL . 'list');
+        exit();
+    } else {
+        // Si el ID no es válido, redirigir
+        $_SESSION['delete'] = 'fail';
+        $_SESSION['error'] = 'ID de usuario no válido.';
+        header('Location: ' . BASE_URL . 'list');
+        exit();
     }
+}
+
 
 
     public function addUser()

@@ -68,6 +68,11 @@
                     <p><strong>Stock:</strong> <?= $producto->getStock() ?></p>
                     <p><strong>Oferta:</strong> <?= $producto->getOferta() ?></p>
                     <p><strong>Fecha:</strong> <?= $producto->getFecha() ?></p>
+
+                    <form action="<?= BASE_URL ?>/addcart" method="POST">
+                        <input type="hidden" name="producto_id" value="<?= htmlspecialchars($producto->getId()) ?>">
+                        <button class="btn-agregar-carrito" type="submit">Agregar al carrito</button>
+                    </form>
                 </div>
             </div>
         <?php endforeach; ?>

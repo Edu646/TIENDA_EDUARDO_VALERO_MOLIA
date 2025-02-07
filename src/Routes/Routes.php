@@ -132,13 +132,6 @@ class Routes {
             (new ProductoController())->eliminarDelCarrito();
         });
         
-        Router::add('GET', '/aumentar', function () {
-            (new ProductoController())->aumentarCantidad();
-        });
-
-        Router::add('POST', '/disminuir', function () {
-            (new ProductoController())->disminuirCantidad();
-        });
 
         Router::add('GET', '/carrito', function () {
             error_log("Checkpoint: Cargando la vista de inicio");
