@@ -5,6 +5,7 @@ namespace Controllers;
 use Services\ProductoService;
 use Lib\Pages;
 use Lib\Database;
+use Models\Producto;
 use PDO;
 use PDOException;
 
@@ -20,8 +21,7 @@ class ProductoController {
         $this->pages = new Pages();
     }
 
-    public function ver_Form()
-    {
+    public function ver_Form() {
         error_log("Checkpoint: Entrando al método ver_Form");
         $this->pages->render('Product/Productoform');
     }
@@ -37,15 +37,11 @@ class ProductoController {
             $fecha = $_POST['fecha'] ?? '';
             $imagen = '';
 
-            // Manejar la subida de la imagen
             if (!empty($_FILES['imagen']['name']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
                 $uploadDir = 'uploads/';
-                
-                // Verificar y crear la carpeta si no existe
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0777, true);
                 }
-                
                 $uploadFile = $uploadDir . basename($_FILES['imagen']['name']);
                 if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadFile)) {
                     $imagen = $uploadFile;
@@ -58,21 +54,16 @@ class ProductoController {
                 $imagen = $_POST['imagen_url'] ?? '';
             }
 
-            if (!empty($nombre)) {
-                $producto = new \Models\Producto($nombre, null, $categoria_id, $descripcion, $precio, $stock, $oferta, $fecha, $imagen);
+            if (!empty($nombre) && !empty($categoria_id)) {
+                $producto = new Producto($nombre, null, $categoria_id, $descripcion, $precio, $stock, $oferta, $fecha, $imagen);
                 $result = $this->productoService->addProducto($producto);
-
                 if ($result) {
                     header('Location: ' . BASE_URL );
                     exit;
-                } else {
-                    header('Location: /error');
-                    exit;
                 }
-            } else {
-                header('Location: /error');
-                exit;
             }
+            header('Location: /error');
+            exit;
         } else {
             $this->pages->render('Product/Productoform');
         }
@@ -91,16 +82,161 @@ class ProductoController {
     public function eliminarProducto() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
             $producto_id = $_POST['producto_id'];
-            
             $result = $this->productoService->deleteProducto($producto_id);
-            
             if ($result) {
                 header('Location: ' . BASE_URL );
                 exit;
-            } else {
-                header('Location: /error');
+            }
+        }
+        header('Location: /error');
+        exit;
+    }
+
+    public function agregarAlCarrito() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
+            $producto_id = $_POST['producto_id'];
+            $cantidad = $_POST['cantidad'] ?? 1;  // Obtener la cantidad desde el formulario (por defecto 1)
+    
+            // Obtener los detalles del producto a partir de la base de datos
+            $producto = $this->productoService->getProductoById($producto_id);
+    
+            if ($producto) {
+                // Verificar si la cantidad solicitada no excede el stock disponible
+                if ($cantidad > $producto->getStock()) {
+                    // Si la cantidad es mayor que el stock, mostrar un mensaje de error
+                    $_SESSION['error'] = "No hay suficiente stock disponible. Stock actual: " . $producto->getStock();
+                    header('Location: ' . BASE_URL . '/carrito');
+                    exit;
+                }
+    
+                // Si la sesión del carrito no está iniciada, iniciarla
+                if (!isset($_SESSION['carrito'])) {
+                    $_SESSION['carrito'] = [];
+                }
+    
+                // Comprobar si el producto ya está en el carrito
+                $productoExistente = false;
+                foreach ($_SESSION['carrito'] as &$item) {
+                    if ($item['producto_id'] == $producto_id) {
+                        // Si el producto ya existe en el carrito, actualizamos la cantidad
+                        if ($item['cantidad'] + $cantidad > $producto->getStock()) {
+                            // Verificar que la nueva cantidad no exceda el stock
+                            $_SESSION['error'] = "No puedes agregar más de " . $producto->getStock() . " unidades de este producto.";
+                            header('Location: ' . BASE_URL . '/carrito');
+                            exit;
+                        }
+                        $item['cantidad'] += $cantidad;
+                        $productoExistente = true;
+                        break;
+                    }
+                }
+    
+                // Si el producto no está en el carrito, agregarlo con la cantidad especificada
+                if (!$productoExistente) {
+                    $_SESSION['carrito'][] = [
+                        'producto_id' => $producto_id,
+                        'nombre' => $producto->getNombre(),
+                        'precio' => $producto->getPrecio(),
+                        'cantidad' => $cantidad,
+                        'imagen' => $producto->getImagen(),
+                    ];
+                }
+    
+                // Redirigir al carrito
+                header('Location: ' . BASE_URL . '/carrito');
                 exit;
             }
         }
+    
+        // Si el producto no existe o no se pasa el producto_id, redirigir a error
+        header('Location: /error');
+        exit;
     }
+    
+    public function aumentarCantidad() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
+            $producto_id = $_POST['producto_id'];
+            $cantidad = $_POST['cantidad'] ?? 1;
+    
+            // Buscar el producto en el carrito
+            foreach ($_SESSION['carrito'] as &$item) {
+                if ($item['producto_id'] == $producto_id) {
+                    $producto = $this->productoService->getProductoById($producto_id);
+    
+                    // Verificar si hay stock suficiente
+                    if ($producto && $item['cantidad'] + $cantidad <= $producto->getStock()) {
+                        $item['cantidad'] += $cantidad;
+                        header('Location: ' . BASE_URL . '/carrito');
+                        exit;
+                    } else {
+                        $_SESSION['error'] = "No hay suficiente stock disponible.";
+                        header('Location: ' . BASE_URL . '/carrito');
+                        exit;
+                    }
+                }
+            }
+        }
+    
+        header('Location: /error');
+        exit;
+    }
+    
+    public function disminuirCantidad() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
+            $producto_id = $_POST['producto_id'];
+    
+            // Buscar el producto en el carrito
+            foreach ($_SESSION['carrito'] as &$item) {
+                if ($item['producto_id'] == $producto_id) {
+                    if ($item['cantidad'] > 1) {
+                        $item['cantidad'] -= 1;
+                        header('Location: ' . BASE_URL . '/carrito');
+                        exit;
+                    } else {
+                        // Si la cantidad es 1, no podemos disminuirla más
+                        $_SESSION['error'] = "La cantidad no puede ser menor a 1.";
+                        header('Location: ' . BASE_URL . '/carrito');
+                        exit;
+                    }
+                }
+            }
+        }
+    
+        header('Location: /error');
+        exit;
+    }
+    
+    
+
+    public function eliminarDelCarrito() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
+            $producto_id = $_POST['producto_id'];
+    
+            // Verificar si el carrito está en la sesión
+            if (isset($_SESSION['carrito'])) {
+                // Recorrer el carrito y buscar el producto
+                foreach ($_SESSION['carrito'] as $index => $item) {
+                    if ($item['producto_id'] == $producto_id) {
+                        // Eliminar el producto del carrito
+                        unset($_SESSION['carrito'][$index]);
+    
+                        // Reindexar el array del carrito para evitar huecos en los índices
+                        $_SESSION['carrito'] = array_values($_SESSION['carrito']);
+    
+                        // Redirigir al carrito o a la página correspondiente
+                        header('Location: ' . BASE_URL . '/carrito');
+                        exit;
+                    }
+                }
+            }
+        }
+        // Si no se encuentra el producto en el carrito o no se pasa el producto_id, redirigir a error
+        header('Location: /error');
+        exit;
+    }
+
+    
+    
+    
+    
 }

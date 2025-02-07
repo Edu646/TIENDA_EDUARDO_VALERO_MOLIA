@@ -1,127 +1,208 @@
-<?php
-
-// Verificar si el carrito está vacío
-if (!isset($_SESSION['carrito']) || empty($_SESSION['carrito'])) {
-    echo "Tu carrito está vacío.";
-    exit;
-}
-
-// Actualizar cantidades
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['producto_id']) && isset($_POST['cantidad'])) {
-    $productoId = $_POST['producto_id'];
-    $cantidad = $_POST['cantidad'];
-
-    if ($cantidad <= 0) {
-        // Eliminar el producto si la cantidad es 0 o menos
-        unset($_SESSION['carrito'][$productoId]);
-    } else {
-        // Actualizar la cantidad
-        $_SESSION['carrito'][$productoId]['cantidad'] = $cantidad;
-    }
-}
-?>
-
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras</title>
+
     <style>
-        /* Estilos para la vista del carrito */
+        /* Estilos generales */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
+            color: #343a40;
         }
 
-        #title {
+        h1 {
             text-align: center;
-            color: #444;
-            margin: 20px 0;
-            font-size: 2em;
+            margin-top: 20px;
         }
 
-        .producto-carrito {
-            width: 80%;
-            max-width: 600px;
-            margin: 10px auto;
+        /* Contenedor principal */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Estilo de la tabla */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Cabecera de la tabla */
+        table th {
             padding: 15px;
-            background: #ffffff;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Celdas de la tabla */
+        table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Filas alternas */
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Estilo para las imágenes */
+        img {
+            width: 80px;
+            height: 80px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            object-fit: cover;
         }
 
-        .producto-carrito img {
-            width: 100px;
-            height: auto;
-            border-radius: 8px;
-            margin-right: 15px;
+        /* Texto cuando no hay imagen */
+        span {
+            color: #888;
+            font-style: italic;
         }
 
-        .producto-carrito div {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        button {
-            background-color: #007BFF;
-            color: #fff;
+        /* Botón para eliminar producto */
+        .btn-eliminar {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 16px;
             border: none;
-            border-radius: 5px;
-            padding: 10px 15px;
             cursor: pointer;
-            font-size: 1em;
-            margin-top: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
         }
 
-        button:hover {
+        .btn-eliminar:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Botón para actualizar cantidad */
+        .btn-actualizar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-actualizar:hover {
+            background-color: #218838;
+        }
+
+        /* Estilo para el total */
+        .total {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .total p {
+            margin: 10px 0;
+        }
+
+        /* Botón de proceder al pago */
+        .btn-pagar {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn-pagar:hover {
             background-color: #0056b3;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            table td, table th {
+                padding: 10px;
+            }
+
+            table img {
+                width: 60px;
+                height: 60px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1 id="title">Tu Carrito de Compras</h1>
 
-    <div class="productos-carrito">
-        <?php
-        try {
-            $dsn = "mysql:host=localhost;dbname=tienda;charset=utf8";
-            $username = "root";
-            $password = "";
-            $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+<div class="container">
+    <h1>Carrito de Compras</h1>
 
-            $pdo = new PDO($dsn, $username, $password, $options);
+    <?php if (isset($_SESSION['carrito']) && count($_SESSION['carrito']) > 0): ?>
 
-            // Mostrar productos del carrito
-            foreach ($_SESSION['carrito'] as $productoId => $productoData) {
-                $sqlProducto = "SELECT id, nombre, precio, imagen FROM productos WHERE id = :productoId";
-                $stmtProducto = $pdo->prepare($sqlProducto);
-                $stmtProducto->execute(['productoId' => $productoId]);
+        <table>
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $totalCarrito = 0; ?>
+                <?php foreach ($_SESSION['carrito'] as $item): ?>
+                    <tr>
+                        <td>
+                            <?php if ($item['imagen']): ?>
+                                <img src="<?= htmlspecialchars($item['imagen']) ?>" alt="Imagen del producto">
+                            <?php else: ?>
+                                <span>No disponible</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= htmlspecialchars($item['nombre']) ?></td>
+                        <td>
+                            <form action="<?= BASE_URL ?>/carrito/actualizarCantidad" method="POST">
+                                <input type="number" name="cantidad" value="<?= $item['cantidad'] ?>" min="1" style="width: 60px;">
+                                <input type="hidden" name="producto_id" value="<?= $item['producto_id'] ?>">
+                                <button class="btn-actualizar" type="submit">Actualizar</button>
+                            </form>
+                        </td>
+                        <td><?= htmlspecialchars($item['precio']) ?> €</td>
+                        <td><?= htmlspecialchars($item['precio'] * $item['cantidad']) ?> €</td>
+                        <td>
+                            <!-- Formulario de eliminación -->
+                            <form action="<?= BASE_URL ?>/eliminarcartus" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                                <input type="hidden" name="producto_id" value="<?= $item['producto_id'] ?>">
+                                <button class="btn-eliminar" type="submit">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php $totalCarrito += $item['precio'] * $item['cantidad']; ?>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
 
-                $producto = $stmtProducto->fetch(PDO::FETCH_ASSOC);
+        <div class="total">
+            <p>Total: <?= htmlspecialchars($totalCarrito) ?> €</p>
+            <a href="<?= BASE_URL ?>/checkout" class="btn-pagar">Proceder al pago</a>
+        </div>
 
-                echo '<div class="producto-carrito">';
-                echo '<img src="' . $producto['imagen'] . '" alt="' . $producto['nombre'] . '">';
-                echo '<div>';
-                echo '<p>' . $producto['nombre'] . '</p>';
-                echo '<p>Precio: $' . $producto['precio'] . '</p>';
-                echo '<p>Cantidad: 
-                    <form method="POST" action="">
-                        <input type="hidden" name="producto_id" value="' . $producto['id'] . '">
-                        <input type="number" name="cantidad" value="' . $productoData['cantidad'] . '" min="1">
-                        <button type="submit">Actualizar Cantidad</button>
-                    </form>
-                </p>';
-                echo '</div>';
-                echo '</div>';
-            }
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-        ?>
-    </div>
+    <?php else: ?>
+        <p>No hay productos en tu carrito.</p>
+    <?php endif; ?>
+</div>
+
 </body>
 </html>

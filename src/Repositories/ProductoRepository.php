@@ -13,16 +13,35 @@ class ProductoRepository {
     }
 
     public function insert(Producto $producto) {
-        $stmt = $this->db->prepare("INSERT INTO Productos (nombre, categoria_id, descripcion, precio, stock, oferta, fecha, imagen) VALUES (:nombre, :categoria_id, :descripcion, :precio, :stock, :oferta, :fecha, :imagen)");
-        $stmt->bindParam(':nombre', $producto->getNombre());
-        $stmt->bindParam(':categoria_id', $producto->getCategoriaId());
-        $stmt->bindParam(':descripcion', $producto->getDescripcion());
-        $stmt->bindParam(':precio', $producto->getPrecio());
-        $stmt->bindParam(':stock', $producto->getStock());
-        $stmt->bindParam(':oferta', $producto->getOferta());
-        $stmt->bindParam(':fecha', $producto->getFecha());
-        $stmt->bindParam(':imagen', $producto->getImagen());
-        return $stmt->execute();
+        try {
+            $stmt = $this->db->prepare("INSERT INTO Productos (nombre, categoria_id, descripcion, precio, stock, oferta, fecha, imagen) 
+                                        VALUES (:nombre, :categoria_id, :descripcion, :precio, :stock, :oferta, :fecha, :imagen)");
+
+            // Asignamos los valores a variables antes de pasarlos a bindParam()
+            $nombre = $producto->getNombre();
+            $categoria_id = $producto->getCategoriaId();
+            $descripcion = $producto->getDescripcion();
+            $precio = $producto->getPrecio();
+            $stock = $producto->getStock();
+            $oferta = $producto->getOferta();
+            $fecha = $producto->getFecha();
+            $imagen = $producto->getImagen();
+
+            // Usamos bindParam con las variables en lugar de los métodos directamente
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
+            $stmt->bindParam(':descripcion', $descripcion);
+            $stmt->bindParam(':precio', $precio, PDO::PARAM_STR);
+            $stmt->bindParam(':stock', $stock, PDO::PARAM_INT);
+            $stmt->bindParam(':oferta', $oferta, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $fecha);
+            $stmt->bindParam(':imagen', $imagen);
+
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            error_log('Error al insertar el producto: ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function findAll() {
@@ -33,7 +52,6 @@ class ProductoRepository {
         }, $result);
     }
 
-    // Método para eliminar un producto por ID
     public function deleteProductoById($producto_id) {
         try {
             $sql = "DELETE FROM Productos WHERE id = :id";
@@ -45,4 +63,25 @@ class ProductoRepository {
             return false;
         }
     }
+   
+
+    public function findById($producto_id) {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM Productos WHERE id = :id");
+            $stmt->bindParam(':id', $producto_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if ($data) {
+                return Producto::fromArray($data);
+            }
+            return null;
+        } catch (\PDOException $e) {
+            error_log('Error al obtener producto: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
+    
+
 }

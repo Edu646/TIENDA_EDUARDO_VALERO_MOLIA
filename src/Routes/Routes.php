@@ -1,11 +1,12 @@
 <?php
 
 namespace Routes;
-
+use Repositories\ProductoRepository;
+use Services\CarritoService;
+use Services\ProductoService;
 use Controllers\CategoryController;
 use Controllers\AuthController;
-use Controllers\UserController; 
-use Controllers\AdminController;
+use Controllers\CarritoController;
 use Controllers\ProductoController;
 use Lib\Router;  
 use Src\Controllers\ErrorController;
@@ -70,8 +71,6 @@ class Routes {
             (new AuthController())->deleteUser($id);
         });
        
-        
-
         // logout
         Router::add('GET', 'logout', function () {
             error_log("Checkpoint: Ruta GET /logout ejecutada");
@@ -92,7 +91,6 @@ class Routes {
             }
         });
 
-        
         /* CATEGORY CONTROLLER */
         Router::add('GET', '/vista', function () {
             (new CategoryController())->ver_Form();
@@ -109,7 +107,6 @@ class Routes {
         Router::add('GET', '/CrearP', function () {
             (new ProductoController())->ver_Form();
         });
-        
 
         Router::add('POST', 'CrearP', function () {
             (new ProductoController())->addProducto();
@@ -126,18 +123,31 @@ class Routes {
         Router::add('POST', '/verP_admin', function () {
             (new ProductoController())->eliminarProducto();
         });
+
+        Router::add('POST', '/addcart', function () {
+            (new ProductoController())->agregarAlCarrito();
+        });
+
+        Router::add('POST', '/eliminarcartus', function () {
+            (new ProductoController())->eliminarDelCarrito();
+        });
         
+        Router::add('GET', '/aumentar', function () {
+            (new ProductoController())->aumentarCantidad();
+        });
+
+        Router::add('POST', '/disminuir', function () {
+            (new ProductoController())->disminuirCantidad();
+        });
+
         Router::add('GET', '/carrito', function () {
             error_log("Checkpoint: Cargando la vista de inicio");
             // Usa tu clase Pages para cargar la vista de inicio
             $pages = new \Lib\Pages();
             $pages->render('Carrito'); 
         });
-        
 
 
-        // Despachar las rutas
-        error_log("Checkpoint: Despachando rutas");
         Router::dispatch();
     }
 }

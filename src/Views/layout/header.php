@@ -129,7 +129,6 @@
                 <li><a href="<?= BASE_URL ?>">Inicio</a></li>
                 <li><a href="<?= BASE_URL ?>login">Iniciar Sesión</a></li>
                 <li><a href="<?= BASE_URL ?>register">Registrarse</a></li>
-                <li><a href="<?= BASE_URL ?>vista">Categorías</a></li>
                 <li><a href="<?= BASE_URL ?>verP">Lista de Productos</a></li>
             <?php endif; ?>
         </ul>
@@ -145,6 +144,7 @@
                 <li><a href="<?= BASE_URL ?>listus">Gestionar Usuarios</a></li>
                 <li><a href="<?= BASE_URL ?>CrearP">Gestionar Productos</a></li>
                 <li><a href="<?= BASE_URL ?>verP_admin">verProductos_admin</a></li>
+                <li><a href="<?= BASE_URL ?>vista">Categorías</a></li>
             </ul>
         </div>
     <?php endif; ?>
