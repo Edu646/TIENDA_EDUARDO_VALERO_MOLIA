@@ -66,6 +66,19 @@ class UserService
         return $user;
     }
 
+
+    public function deleteUserByEmail($email)
+    {
+        // Buscar usuario por email
+        $usuario = $this->userRepository->findByEmail($email);
+        
+        if ($usuario) {
+            // Eliminar el usuario utilizando el ID
+            $this->userRepository->delete($usuario->getId());
+            return true;
+        }
+        return false; // No se encontró el usuario
+    }
  
 }
 ?>

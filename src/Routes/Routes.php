@@ -67,8 +67,8 @@ class Routes {
             (new AuthController())->addUser();
         });
 
-        Router::add('POST', '/DelUs/{id}', function ($id) {
-            (new AuthController())->deleteUser($id);
+        Router::add('POST', '/DelUs', function ($email) {
+            (new AuthController())->deleteUser($email);
         });
        
         // logout

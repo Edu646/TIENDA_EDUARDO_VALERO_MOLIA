@@ -164,12 +164,12 @@ button:hover {
                         <td><?= htmlspecialchars($usuario->getRol()) ?></td>
                         <td>
                             <!-- Formulario para editar usuario -->
-                            <form action="<?= BASE_URL ?>editUser/<?= $usuario->getId() ?>" method="GET" style="display:inline;">
+                            <form action="<?= BASE_URL ?>/editUser" method="GET" >
                                 <button type="submit">Editar</button>
                             </form>
 
                             <!-- Formulario para eliminar usuario -->
-                            <form action="<?= BASE_URL ?>DelUs/<?= $usuario->getId() ?>" method="POST" style="display:inline;">
+                            <form action="<?= BASE_URL ?>/DelUs" method="POST" >
                                 <button type="submit" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">Eliminar</button>
                             </form>
                         </td>

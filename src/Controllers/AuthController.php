@@ -176,41 +176,42 @@ public function editUser($id)
     
 
    // Función para eliminar un usuario
-public function deleteUser($id)
-{
-    error_log("Checkpoint: Eliminando usuario con ID $id");
-
-    // Verificar si el ID es válido antes de proceder
-    if ($id) {
-        try {
-            // Buscar el usuario en la base de datos por ID
-            $usuario = $this->userRepository->findById($id);
-            
-            if ($usuario) {
-                // Eliminar el usuario de la base de datos
-                $this->userRepository->delete($id);
-                $_SESSION['delete'] = 'success';
-                error_log("Usuario eliminado exitosamente con ID " . $id);
-            } else {
-                throw new \Exception("El usuario no existe.");
-            }
-        } catch (\Exception $e) {
-            $_SESSION['delete'] = 'fail';
-            $_SESSION['error'] = $e->getMessage();
-            error_log("Error al eliminar el usuario: " . $e->getMessage());
-        }
-
-        // Redirigir a la lista de usuarios después de eliminar
-        header('Location: ' . BASE_URL . 'list');
-        exit();
-    } else {
-        // Si el ID no es válido, redirigir
-        $_SESSION['delete'] = 'fail';
-        $_SESSION['error'] = 'ID de usuario no válido.';
-        header('Location: ' . BASE_URL . 'list');
-        exit();
-    }
-}
+   public function deleteUser($email)
+   {
+       error_log("Checkpoint: Eliminando usuario con email $email");
+   
+       // Verificar si el email es válido antes de proceder
+       if ($email) {
+           try {
+               // Buscar el usuario en la base de datos por email
+               $usuario = $this->userRepository->findByEmail($email);
+               
+               if ($usuario) {
+                   // Eliminar el usuario de la base de datos
+                   $this->userRepository->delete($usuario->getId());  // Suponiendo que usas el ID internamente para borrar
+                   $_SESSION['delete'] = 'success';
+                   error_log("Usuario eliminado exitosamente con email " . $email);
+               } else {
+                   throw new \Exception("El usuario con el email $email no existe.");
+               }
+           } catch (\Exception $e) {
+               $_SESSION['delete'] = 'fail';
+               $_SESSION['error'] = $e->getMessage();
+               error_log("Error al eliminar el usuario: " . $e->getMessage());
+           }
+   
+           // Redirigir a la lista de usuarios después de eliminar
+           header('Location: ' . BASE_URL );
+           exit();
+       } else {
+           // Si el email no es válido, redirigir
+           $_SESSION['delete'] = 'fail';
+           $_SESSION['error'] = 'Email no válido.';
+           header('Location: ' . BASE_URL . 'list');
+           exit();
+       }
+   }
+   
 
 
 
