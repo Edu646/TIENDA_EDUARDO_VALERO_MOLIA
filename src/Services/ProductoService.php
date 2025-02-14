@@ -3,6 +3,7 @@ namespace Services;
 
 use Repositories\ProductoRepository;
 use Models\Producto;
+use \PDO;
 
 class ProductoService {
     private $productoRepository;
@@ -32,5 +33,7 @@ class ProductoService {
     public function getProductoById($producto_id) {
         return $this->productoRepository->findById($producto_id);
     }
+
     
+
 }    

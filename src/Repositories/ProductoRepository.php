@@ -81,7 +81,22 @@ class ProductoRepository {
             return null;
         }
     }
+
+    public function getConnection() {
+        // Assuming you have a database connection setup
+        // Replace the following line with your actual database connection code
+        return new \PDO('mysql:host=localhost;dbname=your_database', 'username', 'password');
+    }
+
+    public function reducirStock(int $productoId, int $cantidad): bool
+    {
+        $stmt = $this->db->prepare("UPDATE productos SET stock = stock - :cantidad WHERE id = :producto_id");
+        $stmt->bindParam(':cantidad', $cantidad);
+        $stmt->bindParam(':producto_id', $productoId);
+        return $stmt->execute();
+    }
+}
     
     
 
-}
+

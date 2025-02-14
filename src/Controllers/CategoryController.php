@@ -77,4 +77,43 @@ class CategoryController
             }
         }
     }
+
+    public function borrarCategoria()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id'] ?? '';
+            if (!empty($id) && $this->categoryService->deleteCategory($id)) {
+                echo "Categoría borrada correctamente.";
+                header('Location: ' . BASE_URL);
+                exit;
+            } else {
+                echo "Error al borrar la categoría.";
+            }
+        } else {
+            $this->verCategorias();
+        }
+    }
+
+    public function editarCategoria()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'] ?? '';
+        $nombre = $_POST['nombre'] ?? '';
+        if (!empty($id) && !empty($nombre) && $this->categoryService->updateCategory($id, $nombre)) {
+            echo "Categoría actualizada correctamente.";
+            header('Location: ' . BASE_URL . '/adminCategorias');
+            exit;
+        } else {
+            echo "Error al actualizar la categoría.";
+        }
+    } else {
+        $this->verCategorias();
+    }
+}
+
+    public function adminCategorias()
+    {
+        $categorias = $this->categoryService->getAllCategories();
+        $this->pages->render('admin/AdminCategorias', ['categorias' => $categorias]);
+    }
 }

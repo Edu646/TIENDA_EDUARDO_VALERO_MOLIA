@@ -21,5 +21,5 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'Controllers\\' => array($baseDir . '/src/Controllers'),
-    'Asus\\MiTienda\\' => array($baseDir . '/src'),
+    'Asus\\TiendaEduardo\\' => array($baseDir . '/src'),
 );

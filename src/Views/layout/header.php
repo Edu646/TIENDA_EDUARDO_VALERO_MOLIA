@@ -145,6 +145,7 @@
                 <li><a href="<?= BASE_URL ?>CrearP">Gestionar Productos</a></li>
                 <li><a href="<?= BASE_URL ?>verP_admin">verProductos_admin</a></li>
                 <li><a href="<?= BASE_URL ?>vista">Categorías</a></li>
+                <li><a href="<?= BASE_URL ?>adminCategorias">adminCategorias</a></li>
             </ul>
         </div>
     <?php endif; ?>

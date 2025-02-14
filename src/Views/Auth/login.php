@@ -18,3 +18,10 @@
 
     <button type="submit">Iniciar Sesión</button>
 </form>
+
+<form action="<?= BASE_URL ?>showRecoveryForm" method="POST">
+<button type="submit">
+    Recuperar Contraseña
+</button>
+
+</form>

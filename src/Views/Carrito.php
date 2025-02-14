@@ -1,180 +1,183 @@
-
-
+<!-- filepath: /c:/xampp/htdocs/TiendaEduardo/src/Views/Carrito.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito de Compras</title>
     <style>
-        body {
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
         }
 
-        header {
-            background-color: #333;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .carrito-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .carrito-table {
-            width: 80%;
-            max-width: 1000px;
-            margin-bottom: 20px;
-            border-collapse: collapse;
-        }
-
-        .carrito-table th, .carrito-table td {
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        .carrito-table th {
-            background-color: #333;
-            color: white;
-        }
-
-        .carrito-table td img {
-            max-width: 100px;
-            height: auto;
-        }
-
-        .carrito-table input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            margin-top: 5px;
-        }
-
-        .actions {
-            margin-top: 20px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-        }
-
-        .error-message {
+        .error {
             color: red;
             margin-bottom: 20px;
         }
 
-        .carrito-footer {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .cantidad-control {
             display: flex;
-            justify-content: space-between;
-            width: 80%;
-            max-width: 1000px;
-            margin-top: 20px;
+            align-items: center;
+            justify-content: center;
         }
 
-        .total-price {
-            font-size: 20px;
-            font-weight: bold;
+        .cantidad-control button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin: 0 5px;
         }
 
-        .empty-cart {
-            font-size: 18px;
+        .cantidad-control button:hover {
+            background-color: #0056b3;
+        }
+
+        .cantidad-control input {
+            width: 40px;
             text-align: center;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .btn-eliminar {
+            background-color: #dc3545;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+        }
+
+        .total {
+            font-size: 18px;
             margin-top: 20px;
         }
 
-        .empty-cart a {
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .btn-continuar {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
             text-decoration: none;
-            color: #007bff;
+            border-radius: 5px;
+        }
+
+        .btn-continuar:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🛒 Carrito de Compras</h1>
 
-<header>
-    <h1>Carrito de Compras</h1>
-</header>
-
-<div class="carrito-container">
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="error-message">
-            <?= $_SESSION['error']; ?>
-            <?php unset($_SESSION['error']); ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (isset($_SESSION['carrito']) && count($_SESSION['carrito']) > 0): ?>
-        <table class="carrito-table">
-            <thead>
-                <tr>
-                    <th>Imagen</th>
-                    <th>Producto</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                    $total = 0;
-                    foreach ($_SESSION['carrito'] as $item):
-                        $subtotal = $item['precio'] * $item['cantidad'];
-                        $total += $subtotal;
-                ?>
-                    <tr>
-                        <td><img src="<?= $item['imagen']; ?>" alt="<?= $item['nombre']; ?>"></td>
-                        <td><?= $item['nombre']; ?></td>
-                        <td>$<?= number_format($item['precio'], 2); ?></td>
-                        <td>
-                            <form action="<?= BASE_URL; ?>/addcart" method="POST">
-                                <input type="hidden" name="producto_id" value="<?= $item['producto_id']; ?>">
-                                <input type="number" name="cantidad" value="<?= $item['cantidad']; ?>" min="1" max="<?= $item['stock']; ?>" required>
-                                <button type="submit" class="btn">Actualizar</button>
-                            </form>
-                        </td>
-                        <td>$<?= number_format($subtotal, 2); ?></td>
-                        <td>
-                            <form action="<?= BASE_URL; ?>/eliminarcartus" method="POST">
-                                <input type="hidden" name="producto_id" value="<?= $item['producto_id']; ?>">
-                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <div class="carrito-footer">
-            <div class="total-price">
-                Total: $<?= number_format($total, 2); ?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="error">
+                <?= $_SESSION['error'] ?>
+                <?php unset($_SESSION['error']); ?>
             </div>
-            <div>
-                <a href="<?= BASE_URL; ?>/checkout" class="btn">Proceder a la compra</a>
-            </div>
-        </div>
-    <?php else: ?>
-        <div class="empty-cart">
-            <p>Tu carrito está vacío. <a href="<?= BASE_URL; ?>/productos">Agregar productos</a></p>
-        </div>
-    <?php endif; ?>
-</div>
+        <?php endif; ?>
 
+        <?php if (!empty($_SESSION['carrito'])): ?>
+            <form action="<?= BASE_URL ?>/actualizarCantidadCarrito" method="post">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($_SESSION['carrito'] as $item): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($item['nombre']) ?></td>
+                                <td><?= number_format($item['precio'], 2) ?> €</td>
+                                <td>
+                                    <div class="cantidad-control">
+                                        <button type="submit" formaction="<?= BASE_URL ?>/disminuirCantidad" name="producto_id" value="<?= $item['producto_id'] ?>">-</button>
+                                        <input type="number" name="cantidad[<?= $item['producto_id'] ?>]" value="<?= $item['cantidad'] ?>" min="1" max="<?= $item['stock'] ?>" readonly>
+                                        <button type="submit" formaction="<?= BASE_URL ?>/aumentarCantidad" name="producto_id" value="<?= $item['producto_id'] ?>">+</button>
+                                    </div>
+                                </td>
+                                <td><?= number_format($item['precio_total'], 2) ?> €</td>
+                                <td>
+                                    <button class="btn-eliminar" type="submit" formaction="<?= BASE_URL ?>/eliminarDelCarrito" name="producto_id" value="<?= $item['producto_id'] ?>">🗑 Eliminar</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <div class="total">
+                    <strong>Total del Carrito: <?= number_format($_SESSION['total_carrito'], 2) ?> €</strong>
+                </div>
+                <button type="submit">Actualizar Cantidades</button>
+            </form>
+
+            <h2>Datos del Cliente</h2>
+            <form method="POST" action="<?= BASE_URL ?>/crearPedido">
+                <label for="provincia">Provincia:</label>
+                <input type="text" id="provincia" name="provincia" required><br>
+
+                <label for="localidad">Localidad:</label>
+                <input type="text" id="localidad" name="localidad" required><br>
+
+                <label for="direccion">Dirección:</label>
+                <input type="text" id="direccion" name="direccion" required><br>
+
+                <button type="submit">Confirmar Pedido</button>
+            </form>
+        <?php else: ?>
+            <p>🛍 El carrito está vacío.</p>
+        <?php endif; ?>
+
+        <a class="btn-continuar" href="<?= BASE_URL ?>">⬅ Seguir Comprando</a>
+    </div>
 </body>
 </html>

@@ -1,16 +1,13 @@
 <?php
 
 namespace Routes;
-use Repositories\ProductoRepository;
-use Services\CarritoService;
-use Services\ProductoService;
 use Controllers\CategoryController;
 use Controllers\AuthController;
-use Controllers\CarritoController;
 use Controllers\ProductoController;
 use Lib\Router;  
 use Src\Controllers\ErrorController;
 use Lib\Database;
+use Controllers\PedidoController;
 
 class Routes {
     public static function index() {
@@ -131,7 +128,37 @@ class Routes {
         Router::add('POST', '/eliminarcartus', function () {
             (new ProductoController())->eliminarDelCarrito();
         });
+
+
+        Router::add('POST', '/editarCategoria', function () {
+            (new CategoryController())->editarCategoria();
+        });
+
+        Router::add('POST', '/borrarCategoria', function () {
+            (new CategoryController())->borrarCategoria();
+        });
         
+        Router::add('GET', '/adminCategorias', function () {
+            (new CategoryController())->adminCategorias();
+        });
+
+        Router::add('POST', '/actualizarCantidadCarrito', function () {
+            (new ProductoController())->actualizarCantidadCarrito();
+        });
+
+        Router::add('POST', '/disminuirCantidad', function () {
+            (new ProductoController())->disminuirCantidad();
+        });
+
+
+        Router::add('POST', '/eliminarDelCarrito', function () {
+            (new ProductoController())->eliminarDelCarrito();
+        });
+
+
+        Router::add('POST', '/aumentarCantidad', function () {
+            (new ProductoController())->aumentarCantidad();
+        });
 
         Router::add('GET', '/carrito', function () {
             error_log("Checkpoint: Cargando la vista de inicio");
@@ -139,6 +166,36 @@ class Routes {
             $pages = new \Lib\Pages();
             $pages->render('Carrito'); 
         });
+
+    
+
+    Router::add('POST', '/crearPedido', function () {
+    (new PedidoController())->crearPedido();
+    });
+
+    Router::add('POST', '/sendRecoveryEmail', function () {
+        (new AuthController())->sendRecoveryEmail();
+    });
+
+    Router::add('POST', '/resetPassword', function () {
+        (new AuthController())->resetPassword();
+    });
+
+    Router::add('GET', '/resetPassword', function () {
+        (new AuthController())->resetPassword();
+    });
+
+
+    Router::add('GET', '/confirmacion', function () {
+        (new PedidoController())->confirmacion();
+    });
+
+
+
+    Router::add('POST', '/showRecoveryForm', function () {
+        (new AuthController())->showRecoveryForm();
+    });
+// ...existing code...
 
 
         Router::dispatch();

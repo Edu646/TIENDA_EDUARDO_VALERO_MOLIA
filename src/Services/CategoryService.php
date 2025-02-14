@@ -24,4 +24,14 @@ class CategoryService
     {
         return $this->categoryRepository->findAll();
     }
+
+    public function deleteCategory($id)
+    {
+        return $this->categoryRepository->deleteCategory($id);
+    }
+
+    public function updateCategory($id, $nombre)
+    {
+        return $this->categoryRepository->updateCategory($id, $nombre);
+    }
 }

@@ -30,4 +30,20 @@ class CategoryRepository
         }
         return $categories;
     }
+
+    
+    public function deleteCategory($id)
+    {
+        $stmt = $this->db->prepare("DELETE FROM categorias WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    public function updateCategory($id, $nombre)
+    {
+        $stmt = $this->db->prepare("UPDATE categorias SET nombre = :nombre WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':nombre', $nombre);
+        return $stmt->execute();
+    }
 }

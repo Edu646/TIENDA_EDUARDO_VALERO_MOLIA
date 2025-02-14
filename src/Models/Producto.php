@@ -16,11 +16,11 @@ class Producto{
     {
         $this->id = $id;
         $this->nombre = $nombre;
-        $this->categoria_id = $categoria_id;
+        $this->setCategoriaId($categoria_id);
         $this->descripcion = $descripcion;
-        $this->precio = $precio;
+        $this->setPrecio($precio);
         $this->stock = $stock;
-        $this->oferta = $oferta;
+        $this->setOferta($oferta);
         $this->fecha = $fecha;
         $this->imagen = $imagen;
     }
@@ -81,6 +81,7 @@ class Producto{
     }
 
     public function setCategoriaId($categoria_id) {
+       
         $this->categoria_id = $categoria_id;
     }
 
@@ -93,14 +94,23 @@ class Producto{
     }
 
     public function setPrecio($precio) {
+        if (!is_numeric($precio)) {
+            throw new \InvalidArgumentException("El precio debe ser un valor numérico.");
+        }
         $this->precio = $precio;
     }
-
+    
     public function setStock($stock) {
+        if (!is_numeric($stock)) {
+            throw new \InvalidArgumentException("El stock debe ser un valor numérico.");
+        }
         $this->stock = $stock;
     }
-
+    
     public function setOferta($oferta) {
+        if (!is_numeric($oferta)) {
+            throw new \InvalidArgumentException("La oferta debe ser un valor numérico.");
+        }
         $this->oferta = $oferta;
     }
 
@@ -111,6 +121,4 @@ class Producto{
     public function setImagen($imagen) {
         $this->imagen = $imagen;
     }
-
-
 }

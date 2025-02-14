@@ -152,7 +152,6 @@ button:hover {
                     <th>Nombre</th>
                     <th>Email</th>
                     <th>Rol</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -162,17 +161,7 @@ button:hover {
                         <td><?= htmlspecialchars($usuario->getNombre()) ?></td>
                         <td><?= htmlspecialchars($usuario->getEmail()) ?></td>
                         <td><?= htmlspecialchars($usuario->getRol()) ?></td>
-                        <td>
-                            <!-- Formulario para editar usuario -->
-                            <form action="<?= BASE_URL ?>/editUser" method="GET" >
-                                <button type="submit">Editar</button>
-                            </form>
-
-                            <!-- Formulario para eliminar usuario -->
-                            <form action="<?= BASE_URL ?>/DelUs" method="POST" >
-                                <button type="submit" onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">Eliminar</button>
-                            </form>
-                        </td>
+                       
                     </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -104,5 +104,49 @@ public function update(User $usuario)
         $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
         $stmt->execute();
     }
+
+    public function saveRecoveryToken($userId, $token)
+    {
+        $db = new \PDO('mysql:host=localhost;dbname=tienda', 'root', '');
+        $stmt = $db->prepare('UPDATE usuarios SET recovery_token = :token WHERE id = :id');
+        $stmt->bindParam(':token', $token);
+        $stmt->bindParam(':id', $userId);
+        $stmt->execute();
+    }
+
+
+    public function findByRecoveryToken($token)
+    {
+        $db = new \PDO('mysql:host=localhost;dbname=tienda', 'root', '');
+        $stmt = $db->prepare('SELECT * FROM usuarios WHERE recovery_token = :token LIMIT 1');
+        $stmt->bindParam(':token', $token);
+        $stmt->execute();
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if ($user) {
+            return User::fromArray($user);
+        }
+
+        return null;
+    }
+
+    public function updatePassword($userId, $hashedPassword)
+    {
+        $db = new \PDO('mysql:host=localhost;dbname=tienda', 'root', '');
+        $stmt = $db->prepare('UPDATE usuarios SET password = :password WHERE id = :id');
+        $stmt->bindParam(':password', $hashedPassword);
+        $stmt->bindParam(':id', $userId);
+        $stmt->execute();
+    }
+
+    public function clearRecoveryToken($userId)
+    {
+        $db = new \PDO('mysql:host=localhost;dbname=tienda', 'root', '');
+        $stmt = $db->prepare('UPDATE usuarios SET recovery_token = NULL WHERE id = :id');
+        $stmt->bindParam(':id', $userId);
+        $stmt->execute();
+    }
+
+    
 }
 ?>

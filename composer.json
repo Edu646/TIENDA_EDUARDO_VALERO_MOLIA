@@ -1,8 +1,8 @@
 {
-    "name": "asus/mi-tienda",
+    "name": "asus/tienda-eduardo",
     "autoload": {
         "psr-4": {
-            "Asus\\MiTienda\\": "src/",
+            "Asus\\TiendaEduardo\\": "src/",
             "Controllers\\": "./src/Controllers",
             "Models\\": "./src/Models",
             "Lib\\": "./src/Lib",
@@ -12,15 +12,10 @@
             "Routes\\": "./src/Routes"
         }
     },
-    "authors": [
-        {
-            "name": "Eduardo Valero",
-            "email": "evaleromolina@gmail.com"
-        }
-    ],
     "require": {
         "vlucas/phpdotenv": "^5.6",
-        "firebase/php-jwt": "^6.11",
-        "phpmailer/phpmailer": "^6.9"
+        "phpmailer/phpmailer": "^6.9",
+        "tecnickcom/tcpdf": "^6.8",
+        "firebase/php-jwt": "^6.11"
     }
 }
