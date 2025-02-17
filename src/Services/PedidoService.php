@@ -31,5 +31,27 @@ class PedidoService
         return $pedidoId;
     }
 
-    
+    /**
+     * Obtiene los pedidos de un usuario específico.
+     */
+    public function obtenerPedidosPorUsuario(int $usuario_id): array
+    {
+        return $this->pedidoRepository->obtenerPedidosPorUsuario($usuario_id);
+    }
+
+    /**
+     * Obtiene todos los pedidos (para administradores).
+     */
+    public function obtenerTodosLosPedidos(): array
+    {
+        return $this->pedidoRepository->obtenerTodosLosPedidos();
+    }
+
+    /**
+     * Actualiza el estado de un pedido.
+     */
+    public function actualizarEstadoPedido(int $pedidoId, string $nuevoEstado): bool
+    {
+        return $this->pedidoRepository->actualizarEstadoPedido($pedidoId, $nuevoEstado);
+    }
 }

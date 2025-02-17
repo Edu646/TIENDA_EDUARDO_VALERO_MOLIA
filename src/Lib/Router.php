@@ -1,7 +1,6 @@
 <?php
 namespace Lib;
 
-
 class Router {
 
     private static $routes = [];
@@ -14,7 +13,7 @@ class Router {
 
     // Método para despachar la ruta solicitada
     public static function dispatch(): void {
-        $method = $_SERVER['REQUEST_METHOD']; // Obtener el método de la solicitud (GET, POST, etc.)
+        $method = $_SERVER['REQUEST_METHOD']; // Obtener el método de la solicitud (GET, POST, DELETE, etc.)
         $action = preg_replace('/TiendaEduardo/', '', $_SERVER['REQUEST_URI']); // Remover el prefijo "miAgenda" de la URL
         $action = trim($action, '/'); // Eliminar barras iniciales y finales
 
@@ -26,24 +25,19 @@ class Router {
             $action = preg_replace('/' . $match[0] . '/', ':id', $action); // Reemplazar el número por ':id'
         }
 
-  /*
-    // Depuración: mostrar las rutas y acción solicitada
-    echo "Debug: Método = $method, Acción = $action<br>";
-    print_r(self::$routes);
-*/
+        // Depuración: Mostrar rutas y la acción solicitada
+        // echo "Debug: Método = $method, Acción = $action<br>";
 
-$fn = self::$routes[$method][$action] ?? null; // Obtener la función asociada a la ruta
+        // Comprobar si la ruta existe en las rutas definidas
+        $fn = self::$routes[$method][$action] ?? null; // Obtener la función asociada a la ruta
 
-if ($fn) {
-    /*
-        echo "Debug: Ruta encontrada. Ejecutando callback.<br>";
-    */
-    echo call_user_func($fn, $param); // Llamar a la función de la ruta
-} else {
-    /*
-        echo "Debug: Ruta no encontrada. Llamando a ErrorController::error404().<br>";
-    */
-}
-
+        if ($fn) {
+            // Ejecutar el callback de la ruta correspondiente
+            // echo "Debug: Ruta encontrada. Ejecutando callback.<br>";
+            echo call_user_func($fn, $param); // Llamar a la función de la ruta
+        } else {
+            // echo "Debug: Ruta no encontrada. Llamando a ErrorController::error404().<br>";
+            // Podrías implementar un controlador para manejar rutas no encontradas
+        }
     }
 }

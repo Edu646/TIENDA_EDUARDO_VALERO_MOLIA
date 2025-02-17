@@ -107,14 +107,13 @@ class User {
 
     // Crear una instancia desde un array
     public static function fromArray(array $data): User {
-        return new User(
-            id: $data['id'] ?? null,
-            nombre: $data['nombre'] ?? '',
-            apellidos: $data['apellidos'] ?? '',
-            email: $data['email'] ?? '',
-            password: $data['password'] ?? '',
-            rol: $data['rol'] ?? ''
-        );
+        $user = new self();
+        $user->id = $data['id'] ?? 0;
+        $user->nombre = $data['nombre'];
+        $user->email = $data['email'];
+        $user->password = $data['password'];
+        $user->rol = $data['rol'] ?? 'user';
+        return $user;
     }
 
     // Convertir el objeto a un array

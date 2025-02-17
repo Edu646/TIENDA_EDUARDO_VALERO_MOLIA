@@ -35,4 +35,44 @@ class PedidoRepository
         $stmt->bindParam(':unidades', $unidades);
         return $stmt->execute();
     }
+
+    public function obtenerPedidosPorUsuario(int $usuario_id): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT p.id, p.fecha, p.estado, p.provincia, p.localidad, p.direccion, 
+                   SUM(lp.unidades * pr.precio) AS total
+            FROM pedidos p
+            LEFT JOIN lineas_pedidos lp ON p.id = lp.pedido_id
+            LEFT JOIN productos pr ON lp.producto_id = pr.id
+            WHERE p.usuario_id = ?
+            GROUP BY p.id
+        ");
+        $stmt->execute([$usuario_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtiene todos los pedidos (para administradores).
+     */
+    public function obtenerTodosLosPedidos(): array
+    {
+        $stmt = $this->db->query("
+            SELECT p.id, p.fecha, p.estado, p.usuario_id, u.email, p.provincia, p.localidad, p.direccion,
+                   GROUP_CONCAT(lp.producto_id) AS productos
+            FROM pedidos p
+            LEFT JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN lineas_pedidos lp ON p.id = lp.pedido_id
+            GROUP BY p.id
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Actualiza el estado de un pedido.
+     */
+    public function actualizarEstadoPedido(int $pedidoId, string $nuevoEstado): bool
+    {
+        $stmt = $this->db->prepare("UPDATE pedidos SET estado = ? WHERE id = ?");
+        return $stmt->execute([$nuevoEstado, $pedidoId]);
+    }
 }

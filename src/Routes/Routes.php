@@ -173,16 +173,8 @@ class Routes {
     (new PedidoController())->crearPedido();
     });
 
-    Router::add('POST', '/sendRecoveryEmail', function () {
-        (new AuthController())->sendRecoveryEmail();
-    });
-
-    Router::add('POST', '/resetPassword', function () {
-        (new AuthController())->resetPassword();
-    });
-
-    Router::add('GET', '/resetPassword', function () {
-        (new AuthController())->resetPassword();
+    Router::add('GET', '/confirmRegistration', function () {
+        (new AuthController())->confirmRegistration();
     });
 
 
@@ -190,11 +182,61 @@ class Routes {
         (new PedidoController())->confirmacion();
     });
 
-
-
-    Router::add('POST', '/showRecoveryForm', function () {
-        (new AuthController())->showRecoveryForm();
+    Router::add('POST', '/sendPasswordRecoveryToken', function () {
+        (new AuthController())->sendPasswordRecoveryToken();
     });
+
+    Router::add('GET', '/resetPassword', function () {
+        (new AuthController())->resetPassword();
+    });
+
+    Router::add('POST', '/resetPassword', function () {
+        (new AuthController())->resetPassword();
+    });
+
+
+    Router::add('GET', '/mis-pedidos', function () {
+        (new PedidoController())->verPedidos();
+    });
+    
+    Router::add('GET', '/ver-detalle', function ($id) {
+        (new PedidoController())->gestionarPedidos($id);
+    });
+    
+    // Rutas para administradores
+    Router::add('GET', '/pedidos', function () {
+        (new PedidoController())->actualizarEstadoPedido();
+    });
+    
+    Router::add('POST', '/actualizar-estado', function () {
+        (new PedidoController())->actualizarEstadoPedido();
+    });
+
+// Obtener todos los productos
+Router::add('GET', '/api/productos', function () {
+    (new ProductoController())->getAllProductosapi();
+});
+
+// Obtener un producto por ID
+Router::add('GET', '/api/productos/{id}', function ($id) {
+    (new ProductoController())->getProductoById($id);
+});
+
+// Crear un nuevo producto
+Router::add('POST', '/api/producto', function () {
+    (new ProductoController())->addProductoApi();
+});
+
+// Actualizar un producto por ID
+Router::add('PUT', '/api/productos/{id}', function ($id) {
+    (new ProductoController())->updateProducto($id);
+});
+
+// Eliminar un producto por ID
+
+
+
+
 // ...existing code...
 
 

@@ -23,7 +23,7 @@ class AuthController
         $this->pages = new Pages();
         $this->userService = new UserService();
         $this->userRepository = new UserRepository(); // Inicializar userRepository
-        $this->jwtSecret = ''; // Replace 'your_secret_key' with your actual secret key
+        $this->jwtSecret = 'Vq3p$z!J8m@XcL5dN2^wYk9T&B7oGfQh'; // Replace 'your_secret_key' with your actual secret key
     }
 
     public function index()
@@ -52,18 +52,48 @@ class AuthController
                     $password = password_hash($usuario->getPassword(), PASSWORD_BCRYPT, ['cost' => 5]);
                     $usuario->setPassword($password);
 
-                    // Verificar si se ha enviado el rol y es válido
-                    $role = isset($userData['role']) && in_array($userData['role'], ['user', 'admin']) ? $userData['role'] : 'user';
-                    $usuario->setRol($role);
+                    // Establecer el rol por defecto como 'user'
+                    $usuario->setRol('user');
 
+                    // Generar token JWT
+                    $payload = [
+                        'sub' => $usuario->getEmail(),
+                        'name' => $usuario->getNombre(),
+                        'password' => $usuario->getPassword(),
+                        'iat' => time(),
+                        'exp' => time() + 3600 // Token expira en 1 hora
+                    ];
+                    $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
+
+                    // Enviar correo de confirmación
+                    // Guardar el token en la sesión
+                    $_SESSION['confirm_token'] = $token;
+
+                    // Enlace limpio sin token en la URL
+                    $confirmationLink = BASE_URL . 'confirmRegistration';
+                    $mail = new PHPMailer(true);
                     try {
-                        $this->userService->registerUser($usuario);
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.mailtrap.io';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = '828a04b69cf388';
+                        $mail->Password = 'd5c6c03cad7d30';
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+
+                        $mail->CharSet = 'UTF-8';
+                        $mail->setFrom('tu_correo@example.com', 'Nombre');
+                        $mail->addAddress($usuario->getEmail());
+                        $mail->isHTML(true);
+                        $mail->Subject = 'Confirmación de registro';
+                        $mail->Body = "Para confirmar su registro, haga clic en el siguiente enlace: <a href='$confirmationLink'>$confirmationLink</a>";
+
+                        $mail->send();
                         $_SESSION['register'] = 'success';
-                        error_log("Checkpoint: Usuario registrado exitosamente con rol " . $role);
-                    } catch (\Exception $e) {
+                        error_log("Checkpoint: Correo de confirmación enviado exitosamente.");
+                    } catch (Exception $e) {
                         $_SESSION['register'] = 'fail';
-                        $_SESSION['error'] = $e->getMessage();
-                        error_log("Error en register: " . $e->getMessage());
+                        $_SESSION['error'] = 'No se pudo enviar el correo de confirmación. Error: ' . $mail->ErrorInfo;
                     }
                 } else {
                     $_SESSION['register'] = 'fail';
@@ -264,103 +294,223 @@ public function editUser($id)
     // Redirigimos de vuelta a la lista de usuarios
     header('Location: ' . BASE_URL );
 }
-
-public function showRecoveryForm()
+public function confirmRegistration()
 {
-    $this->pages->render('Auth/recoveryForm');
-}
+    // Obtener el token desde la sesión en lugar de la URL
+    $token = $_SESSION['confirm_token'] ?? '';
 
-public function sendRecoveryEmail()
-{
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $email = $_POST['email'] ?? '';
+    if (!$token) {
+        $_SESSION['confirm'] = 'fail';
+        $_SESSION['error'] = 'Token no válido.';
+        $this->pages->render('Auth/confirmRegistration');
+        exit();
+    }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['recovery'] = 'fail';
-            $_SESSION['error'] = 'Email no válido.';
-            header('Location: ' . BASE_URL . 'recovery');
+    try {
+        $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
+        unset($_SESSION['confirm_token']); // Eliminar el token de la sesión después de usarlo
+
+        $email = $decoded->sub;
+
+        // Verificar si el usuario ya existe
+        $usuarioExistente = $this->userRepository->findByEmail($email);
+        if ($usuarioExistente) {
+            $_SESSION['confirm'] = 'fail';
+            $_SESSION['error'] = 'El usuario ya está registrado.';
+            $this->pages->render('Auth/confirmRegistration');
             exit();
         }
 
-        $usuario = $this->userRepository->findByEmail($email);
-        if ($usuario) {
-            $payload = [
-                'userId' => $usuario->getId(),
-                'exp' => time() + 3600 // Token expira en 1 hora
-            ];
-            $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
-            $recoveryLink = BASE_URL . 'resetPassword?token=' . urlencode($token);
+        // Crear el usuario y guardarlo en la base de datos
+        $userData = [
+            'email' => $email,
+            'nombre' => $decoded->name,
+            'password' => $decoded->password,
+            'rol' => 'user'
+        ];
+        $usuario = User::fromArray($userData);
+        $this->userService->registerUser($usuario);
 
-            error_log("Enlace de recuperación generado: " . $recoveryLink); // Depuración
-
-            $mail = new PHPMailer(true);
-            try {
-                $mail->isSMTP();
-                $mail->Host = 'smtp.mailtrap.io';
-                $mail->SMTPAuth = true;
-                $mail->Username = '828a04b69cf388';
-                $mail->Password = 'd5c6c03cad7d30';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                $mail->setFrom('tu_correo@example.com', 'Nombre');
-                $mail->addAddress($email);
-                $mail->isHTML(true);
-                $mail->Subject = 'Recuperación de cuenta';
-                $mail->Body = "Para recuperar su cuenta, haga clic en el siguiente enlace: <a href='$recoveryLink'>$recoveryLink</a>";
-
-                $mail->send();
-                $_SESSION['recovery'] = 'success';
-            } catch (Exception $e) {
-                $_SESSION['recovery'] = 'fail';
-                $_SESSION['error'] = 'No se pudo enviar el correo. Error: ' . $mail->ErrorInfo;
-            }
-        } else {
-            $_SESSION['recovery'] = 'fail';
-            $_SESSION['error'] = 'El email no está registrado.';
-        }
-
-        header('Location: ' . BASE_URL );
+        $_SESSION['confirm'] = 'success';
+        $this->pages->render('Auth/confirmRegistration');
+        exit();
+    } catch (\Firebase\JWT\ExpiredException $e) {
+        error_log("Error: El token ha expirado: " . $e->getMessage());
+        $_SESSION['confirm'] = 'fail';
+        $_SESSION['error'] = 'El token ha expirado.';
+        $this->pages->render('Auth/confirmRegistration');
+        exit();
+    } catch (\Exception $e) {
+        error_log("Error al decodificar el token: " . $e->getMessage());
+        $_SESSION['confirm'] = 'fail';
+        $_SESSION['error'] = 'Token no válido o expirado.';
+        $this->pages->render('Auth/confirmRegistration');
         exit();
     }
 }
 
+public function sendPasswordRecoveryToken()
+{
+    error_log("Checkpoint: Iniciando envío de token de recuperación de contraseña");
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Recibimos el correo del formulario
+        $email = $_POST['email'] ?? '';
+
+        if ($email) {
+            // Verificar si el usuario existe en la base de datos
+            $usuario = $this->userRepository->findByEmail($email);
+
+            if ($usuario) {
+                // Generar token para la recuperación de contraseña
+                $payload = [
+                    'sub' => $usuario->getEmail(),
+                    'iat' => time(),
+                    'exp' => time() + 3600 // El token expirará en 1 hora
+                ];
+                $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
+
+                // Guardamos el token en la sesión
+                $_SESSION['reset_token'] = $token;
+
+                // Generar enlace para el restablecimiento de contraseña
+                $resetLink = BASE_URL . "resetPassword";
+
+                // Enviar el correo con el enlace de recuperación
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.mailtrap.io';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = '828a04b69cf388'; // Cambiar con tus credenciales SMTP
+                    $mail->Password = 'd5c6c03cad7d30';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    $mail->CharSet = 'UTF-8';
+                    $mail->setFrom('tu_correo@example.com', 'Soporte');
+                    $mail->addAddress($usuario->getEmail());
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Recuperación de Contraseña';
+                    $mail->Body = "Para restablecer su contraseña, haga clic en el siguiente enlace: <a href='$resetLink'>$resetLink</a>";
+
+                    $mail->send();
+                    $_SESSION['reset'] = 'success';
+                    error_log("Correo de recuperación enviado con éxito.");
+                } catch (Exception $e) {
+                    $_SESSION['reset'] = 'fail';
+                    $_SESSION['error'] = 'No se pudo enviar el correo. Error: ' . $mail->ErrorInfo;
+                    error_log("Error al enviar el correo de recuperación: " . $mail->ErrorInfo);
+                }
+            } else {
+                $_SESSION['reset'] = 'fail';
+                $_SESSION['error'] = 'Correo no encontrado.';
+                error_log("Correo no encontrado en la base de datos.");
+            }
+        } else {
+            $_SESSION['reset'] = 'fail';
+            $_SESSION['error'] = 'Por favor, ingrese un correo válido.';
+            error_log("Correo vacío o no válido.");
+        }
+    }
+
+    // Mostrar el formulario de recuperación o redirigir
+    $this->pages->render('Auth/recoveryForm');
+}
+
+
+
 public function resetPassword()
 {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $token = $_POST['token'] ?? '';
-        $newPassword = $_POST['password'] ?? '';
-        error_log("Token recibido: " . $token);
-        error_log("Nueva contraseña recibida: " . $newPassword);
-        if (!$token || empty($newPassword)) {
+    error_log("Checkpoint: Iniciando proceso de restablecimiento de contraseña");
+
+    // Obtener el token desde la sesión
+    $token = $_SESSION['reset_token'] ?? '';
+
+    if (!$token) {
+        $_SESSION['reset'] = 'fail';
+        $_SESSION['error'] = 'Token no válido o no encontrado.';
+        $this->pages->render('Auth/resetPasswordForm');
+        exit();
+    }
+
+    try {
+        // Decodificar el token JWT para obtener el email del usuario
+        $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
+        
+        // Verificar si el token ha expirado
+        if ($decoded->exp < time()) {
             $_SESSION['reset'] = 'fail';
-            $_SESSION['error'] = 'Datos no válidos.';
-            header('Location: ' . BASE_URL . 'resetPassword?token=' . $token);
+            $_SESSION['error'] = 'El token ha expirado.';
+            $this->pages->render('Auth/resetPasswordForm');
             exit();
         }
 
-        try {
-            $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
-            $userId = $decoded->userId;
-            $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 5]);
-            
-            $this->userRepository->updatePassword($userId, $hashedPassword);
-            $_SESSION['reset'] = 'success';
-            header('Location: ' . BASE_URL . 'login');
-            exit();
-        } catch (\Exception $e) {
-            error_log("Error al decodificar el token: " . $e->getMessage());
-            $_SESSION['reset'] = 'fail';
-            $_SESSION['error'] = 'Token no válido o expirado.';
-            header('Location: ' . BASE_URL . 'recovery');
-            exit();
+        // Si el formulario fue enviado por POST, se actualiza la contraseña
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $newPassword = $_POST['new_password'] ?? '';
+
+            // Verificar si la nueva contraseña es válida
+            if ($newPassword && strlen($newPassword) >= 6) {
+                error_log("Nueva contraseña válida: " . $newPassword); // Verificar la contraseña
+
+                // Buscar el usuario por email
+                $usuario = $this->userRepository->findByEmail($decoded->sub);
+
+                if ($usuario) {
+                    error_log("Usuario encontrado: " . $usuario->getId()); // Verificar si el usuario fue encontrado
+
+                    // Hash de la nueva contraseña
+                    $newPasswordHashed = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 5]);
+
+                    // Intentar actualizar la contraseña en la base de datos usando el método updatePassword
+                    try {
+                        $this->userRepository->updatePassword($usuario->getId(), $newPasswordHashed);
+                        error_log("Contraseña actualizada para el usuario: " . $usuario->getId());
+
+                        // Eliminar el token de la sesión
+                        unset($_SESSION['reset_token']);
+
+                        // Mostrar mensaje de éxito y redirigir
+                        $_SESSION['reset'] = 'success';
+                        header('Location: ' . BASE_URL . 'login');
+                        exit();
+                    } catch (Exception $e) {
+                        error_log("Error al actualizar la contraseña: " . $e->getMessage());
+                    }
+                } else {
+                    $_SESSION['reset'] = 'fail';
+                    $_SESSION['error'] = 'Usuario no encontrado.';
+                    $this->pages->render('Auth/resetPasswordForm');
+                    exit();
+                }
+            } else {
+                $_SESSION['reset'] = 'fail';
+                $_SESSION['error'] = 'La nueva contraseña debe tener al menos 6 caracteres.';
+                $this->pages->render('Auth/resetPasswordForm');
+                exit();
+            }
         }
-    } else {
-        // Renderizar el formulario de cambio de contraseña
-        $token = $_GET['token'] ?? '';
-        error_log("Token para el formulario: " . $token);
-        $this->pages->render('Auth/resetPasswordForm', ['token' => $token]);
+
+        // Renderizar el formulario para restablecer la contraseña
+        $this->pages->render('Auth/resetPasswordForm');
+        
+    } catch (\Firebase\JWT\ExpiredException $e) {
+        $_SESSION['reset'] = 'fail';
+        $_SESSION['error'] = 'El token ha expirado.';
+        $this->pages->render('Auth/resetPasswordForm');
+        exit();
+    } catch (\Exception $e) {
+        $_SESSION['reset'] = 'fail';
+        $_SESSION['error'] = 'Token no válido o expirado.';
+        $this->pages->render('Auth/resetPasswordForm');
+        exit();
     }
 }
+
+
+
+
+
 
 }

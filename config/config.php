@@ -22,4 +22,6 @@ return [
         'from_name' => 'Tienda Eduardo',
     ],
 ];
+
+
 ?>

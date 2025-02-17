@@ -4,6 +4,8 @@ namespace Repositories;
 
 use Models\Producto;
 use PDO;
+use PDOException;
+use Exception;
 
 class ProductoRepository {
     private $db;
@@ -95,6 +97,84 @@ class ProductoRepository {
         $stmt->bindParam(':producto_id', $productoId);
         return $stmt->execute();
     }
+
+
+
+    public function findProductoById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM productos WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($producto) {
+            return new Producto(
+                $producto['nombre'],
+                $producto['id'],
+                $producto['categoria_id'],
+                $producto['descripcion'],
+                $producto['precio'],
+                $producto['stock'],
+                $producto['oferta'],
+                $producto['fecha'],
+                $producto['imagen']
+            );
+        }
+
+        return null;
+    }
+
+    // Método para actualizar un producto en la base de datos
+    public function update(Producto $producto) {
+        $stmt = $this->db->prepare(
+            "UPDATE productos 
+             SET nombre = :nombre, categoria_id = :categoria_id, descripcion = :descripcion, 
+                 precio = :precio, stock = :stock, oferta = :oferta, fecha = :fecha, imagen = :imagen
+             WHERE id = :id"
+        );
+
+        $stmt->execute([
+            'nombre' => $producto->getNombre(),
+            'categoria_id' => $producto->getCategoriaId(),
+            'descripcion' => $producto->getDescripcion(),
+            'precio' => $producto->getPrecio(),
+            'stock' => $producto->getStock(),
+            'oferta' => $producto->getOferta(),
+            'fecha' => $producto->getFecha(),
+            'imagen' => $producto->getImagen(),
+            'id' => $producto->getId()
+        ]);
+
+        return $stmt->rowCount() > 0; // Retorna true si la actualización fue exitosa
+    }
+
+    // Repositorio ProductoRepository
+public function getAllProductos() {
+    $sql = "SELECT * FROM productos";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    return $result;
+}
+
+
+public function deleteProducto($id) {
+    try {
+        $stmt = $this->db->prepare("DELETE FROM productos WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        if(!$stmt->execute()){
+            return false;
+        } if($stmt->rowCount() === 0){
+            return false;
+        } return true;// Devuelve true si se eliminó correctamente, false si no
+    } catch (PDOException $e) {
+        // Manejar errores de base de datos
+        throw new \Exception("Error de base de datos: " . $e->getMessage());
+    }
+}
+
+
+
+
 }
     
     

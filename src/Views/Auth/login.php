@@ -19,7 +19,7 @@
     <button type="submit">Iniciar Sesión</button>
 </form>
 
-<form action="<?= BASE_URL ?>showRecoveryForm" method="POST">
+<form action="<?= BASE_URL ?>sendPasswordRecoveryToken" method="POST">
 <button type="submit">
     Recuperar Contraseña
 </button>

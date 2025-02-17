@@ -9,13 +9,9 @@
     <?php if (isset($_SESSION['reset']) && $_SESSION['reset'] === 'fail'): ?>
         <p style="color: red;"><?php echo $_SESSION['error']; ?></p>
     <?php endif; ?>
-    <form action="resetPassword" method="POST">
-    <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-    
-    <label for="password">Nueva Contraseña:</label>
-    <input type="password" name="password" required>
-    
-    <button type="submit">Restablecer</button>
+    <form method="POST" action="resetPassword">
+    <input type="password" name="new_password" required />
+    <button type="submit">Restablecer contraseña</button>
 </form>
 </body>
 </html>

@@ -122,4 +122,50 @@ class PedidoController
             exit;
         }
     }
+
+
+
+    public function verPedidos()
+    {
+        $usuario_id = $_SESSION['user']['id'];
+        $pedidos = $this->pedidoService->obtenerPedidosPorUsuario($usuario_id);
+    
+        $this->pages->render('Pedidos/Mis-Pedidos', ['pedidos' => $pedidos]);
+    }
+    
+
+
+    public function gestionarPedidos()
+{
+    if ($_SESSION['user']['rol'] !== 'admin') {
+        header('Location: ' . BASE_URL);
+        exit;
+    }
+
+    $pedidos = $this->pedidoService->obtenerTodosLosPedidos();
+    $this->pages->render('Pedidos/Gestionar-pedidos', ['pedidos' => $pedidos]);
+}
+
+
+
+public function actualizarEstadoPedido()
+{
+    if ($_SESSION['user']['rol'] !== 'admin') {
+        header('Location: ' . BASE_URL);
+        exit;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $pedidoId = $_POST['pedido_id'] ?? null;
+        $nuevoEstado = $_POST['estado'] ?? null;
+
+        if ($pedidoId && $nuevoEstado) {
+            $this->pedidoService->actualizarEstadoPedido($pedidoId, $nuevoEstado);
+        }
+    }
+
+    header('Location: ' . BASE_URL . 'Gestionar-pedidos');
+    exit;
+}
+
 }

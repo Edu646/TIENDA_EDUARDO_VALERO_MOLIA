@@ -2,7 +2,7 @@ CREATE DATABASE tienda;
 SET NAMES UTF8;
 CREATE DATABASE IF NOT EXISTS tienda;
 USE tienda;
-
+select * from productos where id = 11;
 -- ...existing code...
 DROP TABLE IF EXISTS usuarios;
 CREATE TABLE IF NOT EXISTS usuarios( 
@@ -65,3 +65,4 @@ CONSTRAINT pk_lineas_pedidos PRIMARY KEY(id),
 CONSTRAINT fk_linea_pedido FOREIGN KEY(pedido_id) REFERENCES pedidos(id),
 CONSTRAINT fk_linea_producto FOREIGN KEY(producto_id) REFERENCES productos(id)
 )ENGINE=InnoDb DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+

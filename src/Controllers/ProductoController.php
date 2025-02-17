@@ -321,6 +321,91 @@ class ProductoController {
         exit;
     }
 
+    public function getAllProductosapi() {
+        $productos = $this->productoService->getAllProductosapi();
+        echo json_encode($productos);
+    }
+    
 
+    public function getProductoById($id) {
+        $producto = $this->productoService->getProductoById($id);
+        if ($producto) {
+            echo json_encode($producto);
+        } else {
+            echo json_encode(['error' => 'Producto no encontrado']);
+        }
+    }
+    
+
+    public function updateProducto($id) {
+        $input = json_decode(file_get_contents("php://input"), true);
+    
+        if (!empty($input)) {
+            try {
+                $producto = new Producto(
+                    $input['nombre'], 
+                    $id, 
+                    $input['categoria_id'], 
+                    $input['descripcion'], 
+                    $input['precio'], 
+                    $input['stock'], 
+                    $input['oferta'], 
+                    $input['fecha'], 
+                    $input['imagen']
+                );
+                $result = $this->productoService->updateProducto($producto);
+                echo json_encode(['success' => true]);
+            } catch (\Exception $e) {
+                echo json_encode(['error' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['error' => 'No se proporcionaron datos para actualizar']);
+        }
+    }
+
+    public function addProductoApi() {
+        // Obtener los datos del cuerpo de la solicitud
+        $input = json_decode(file_get_contents("php://input"), true);
+    
+        if (!empty($input)) {
+            try {
+                // Validación básica de los datos requeridos
+                if (empty($input['nombre']) || empty($input['categoria_id']) || empty($input['precio']) || empty($input['stock'])) {
+                    echo json_encode(['error' => 'Los campos nombre, categoria_id, precio y stock son obligatorios']);
+                    return;
+                }
+    
+                // Crear una nueva instancia del modelo Producto
+                $producto = new Producto(
+                    $input['nombre'], 
+                    null,  // ID se autogenera
+                    $input['categoria_id'], 
+                    $input['descripcion'] ?? '', 
+                    $input['precio'], 
+                    $input['stock'], 
+                    $input['oferta'] ?? 0, 
+                    $input['fecha'] ?? date('Y-m-d'), 
+                    $input['imagen'] ?? ''
+                );
+    
+                // Intentar agregar el producto
+                $result = $this->productoService->addProducto($producto);
+                
+                if ($result) {
+                    echo json_encode(['success' => true, 'message' => 'Producto agregado correctamente']);
+                } else {
+                    echo json_encode(['error' => 'No se pudo agregar el producto']);
+                }
+            } catch (\Exception $e) {
+                echo json_encode(['error' => $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(['error' => 'No se enviaron datos']);
+        }
+    }
+
+
+    
+    
     
 }

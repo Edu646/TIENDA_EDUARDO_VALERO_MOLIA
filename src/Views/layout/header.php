@@ -123,6 +123,7 @@
                 <li><a href="<?= BASE_URL ?>ver">Lista Categorías</a></li>
                 <li><a href="<?= BASE_URL ?>verP">Lista de Productos</a></li>
                 <li><a href="<?= BASE_URL ?>carrito">Carrito</a></li>
+                <li><a href="<?= BASE_URL ?>mis-pedidos">Lista-pedidos</a></li>
 
             <?php else: ?>
                 <!-- Opciones para usuarios no autenticados -->
@@ -146,6 +147,7 @@
                 <li><a href="<?= BASE_URL ?>verP_admin">verProductos_admin</a></li>
                 <li><a href="<?= BASE_URL ?>vista">Categorías</a></li>
                 <li><a href="<?= BASE_URL ?>adminCategorias">adminCategorias</a></li>
+                <li><a href="<?= BASE_URL ?>ver-detalle">adminPedidos</a></li>
             </ul>
         </div>
     <?php endif; ?>
