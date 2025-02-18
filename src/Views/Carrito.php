@@ -173,6 +173,10 @@
 
                 <button type="submit">Confirmar Pedido</button>
             </form>
+
+
+            <form action="<?= BASE_URL ?>/checkout" method="POST">
+    <button type="submit">Pagar con PayPal</button>
         <?php else: ?>
             <p>🛍 El carrito está vacío.</p>
         <?php endif; ?>

@@ -2,6 +2,10 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+define('PAYPAL_CLIENT_ID', 'AcVXyAkPXUm-EmyHCFiRRv8yIoFScRCJuO1L-WhtSeV1-VVs2QXlqueg5nPv6pqdnAGnmXFq7G4uX4O_');
+define('PAYPAL_SECRET', 'EM1sWDEBUmY28wEgdlyz4ritaz-std8aY-XYdmdfP1evpMY_opPpmO9BMD9IsT9UE4cyRtSaddcePVQY');
+define('PAYPAL_MODE', 'sandbox'); 
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 

@@ -172,8 +172,39 @@ public function deleteProducto($id) {
     }
 }
 
+public function delete($id) {
+    try {
+        $this->db->beginTransaction();
+
+        // Eliminar las referencias en lineas_pedidos
+        $sql = "DELETE FROM lineas_pedidos WHERE producto_id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Eliminar el producto
+        $sql = "DELETE FROM productos WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $this->db->commit();
+        return $stmt->rowCount() > 0;
+    } catch (PDOException $e) {
+        $this->db->rollBack();
+        throw $e;
+    }
+}
 
 
+public function getById($id) {
+    $sql = "SELECT * FROM productos WHERE id = :id";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $producto;
+}
 
 }
     

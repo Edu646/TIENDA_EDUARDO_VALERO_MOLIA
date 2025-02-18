@@ -327,15 +327,10 @@ class ProductoController {
     }
     
 
-    public function getProductoById($id) {
-        $producto = $this->productoService->getProductoById($id);
-        if ($producto) {
-            echo json_encode($producto);
-        } else {
-            echo json_encode(['error' => 'Producto no encontrado']);
-        }
+    public function getById($id) {
+        $producto = $this->productoService->getById($id);
+        echo json_encode($producto);
     }
-    
 
     public function updateProducto($id) {
         $input = json_decode(file_get_contents("php://input"), true);
@@ -404,6 +399,16 @@ class ProductoController {
         }
     }
 
+// Método para borrar un producto a través de la API
+public function delete($id) {
+    $result = $this->productoService->delete($id);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Producto eliminado exitosamente']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error al eliminar el producto']);
+    }
+}
 
     
     

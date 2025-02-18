@@ -30,8 +30,8 @@ class ProductoService {
     }
 
 
-    public function getProductoById($producto_id) {
-        return $this->productoRepository->findById($producto_id);
+    public function getProductoById($id) {
+        return $this->productoRepository->findProductoById($id);
     }
 
     public function updateProducto(Producto $producto) {
@@ -55,19 +55,16 @@ class ProductoService {
     return $this->productoRepository->getAllProductos();
 }
 
-public function getProductosByCategoria($categoriaId) {
-    // Obtén todos los productos de la misma categoría
-    $query = "SELECT * FROM productos WHERE categoria_id = :categoria_id";
-    $stmt = $this->productoRepository->getConnection()->prepare($query);
-    $stmt->bindParam(':categoria_id', $categoriaId, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+public function delete($producto_id) {
+    return $this->productoRepository->delete($producto_id);
 }
 
 
-
-
-
+public function getById($id) {
+    return $this->productoRepository->getById($id);
+}
     
 
 }    

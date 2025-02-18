@@ -41,20 +41,20 @@ class AuthController
     public function register()
     {
         error_log("Checkpoint: Entrando al método register");
-
+    
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Checkpoint: Método POST recibido en register");
             if (isset($_POST['data']) && !empty($_POST['data'])) {
                 $userData = $_POST['data'];
                 $usuario = User::fromArray($userData);
-
+    
                 if ($usuario->validar()) {
                     $password = password_hash($usuario->getPassword(), PASSWORD_BCRYPT, ['cost' => 5]);
                     $usuario->setPassword($password);
-
+    
                     // Establecer el rol por defecto como 'user'
                     $usuario->setRol('user');
-
+    
                     // Generar token JWT
                     $payload = [
                         'sub' => $usuario->getEmail(),
@@ -64,11 +64,18 @@ class AuthController
                         'exp' => time() + 3600 // Token expira en 1 hora
                     ];
                     $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
-
+                    $usuario->setToken($token);
+                    // Guardar el token en la base de datos
+                    $db = new \PDO('mysql:host=localhost;dbname=tienda', 'root', '');
+                    $stmt = $db->prepare('UPDATE usuarios SET token = :token WHERE email = :email');
+                    $stmt->bindParam(':token', $token);
+                    $stmt->bindParam(':email', $usuario->getEmail());
+                    $stmt->execute();
+    
                     // Enviar correo de confirmación
                     // Guardar el token en la sesión
                     $_SESSION['confirm_token'] = $token;
-
+    
                     // Enlace limpio sin token en la URL
                     $confirmationLink = BASE_URL . 'confirmRegistration';
                     $mail = new PHPMailer(true);
@@ -80,14 +87,14 @@ class AuthController
                         $mail->Password = 'd5c6c03cad7d30';
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
-
+    
                         $mail->CharSet = 'UTF-8';
                         $mail->setFrom('tu_correo@example.com', 'Nombre');
                         $mail->addAddress($usuario->getEmail());
                         $mail->isHTML(true);
                         $mail->Subject = 'Confirmación de registro';
                         $mail->Body = "Para confirmar su registro, haga clic en el siguiente enlace: <a href='$confirmationLink'>$confirmationLink</a>";
-
+    
                         $mail->send();
                         $_SESSION['register'] = 'success';
                         error_log("Checkpoint: Correo de confirmación enviado exitosamente.");
@@ -105,9 +112,10 @@ class AuthController
                 error_log("Checkpoint: Datos POST no válidos en register");
             }
         }
-
+    
         $this->pages->render('Auth/registerForm');
     }
+    
 
     public function processLogin()
     {
@@ -326,7 +334,8 @@ public function confirmRegistration()
             'email' => $email,
             'nombre' => $decoded->name,
             'password' => $decoded->password,
-            'rol' => 'user'
+            'rol' => 'user',
+            'Token' => $decoded->token
         ];
         $usuario = User::fromArray($userData);
         $this->userService->registerUser($usuario);

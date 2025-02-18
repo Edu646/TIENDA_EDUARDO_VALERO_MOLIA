@@ -11,7 +11,8 @@ class User {
         private string $apellidos = '',
         private string $email = '',
         private string $password = '',
-        private string $rol = ''
+        private string $rol = '',
+        private string $token = ''
     ) {}
 
     // Getters
@@ -48,6 +49,10 @@ class User {
         return self::$errores;
     }
 
+
+    public function gettoken(): string {
+        return $this->token;
+    }
     // Setters
     public function setId(?int $id): void {
         $this->id = $id;
@@ -75,6 +80,10 @@ class User {
 
     public static function setErrores(array $errores): void {
         self::$errores = $errores;
+    }
+
+    public function settoken($token): void {
+        $this->token = $token;
     }
 
     // Validación de los datos
@@ -113,6 +122,7 @@ class User {
         $user->email = $data['email'];
         $user->password = $data['password'];
         $user->rol = $data['rol'] ?? 'user';
+        $user->token = $data['token'] ?? '';
         return $user;
     }
 
@@ -125,6 +135,7 @@ class User {
             'email' => $this->email,
             'password' => $this->password,
             'rol' => $this->rol,
+            'token' => $this->token
         ];
     }
 }

@@ -2,7 +2,7 @@ CREATE DATABASE tienda;
 SET NAMES UTF8;
 CREATE DATABASE IF NOT EXISTS tienda;
 USE tienda;
-select * from productos where id = 11;
+select * from usuarios ;
 -- ...existing code...
 DROP TABLE IF EXISTS usuarios;
 CREATE TABLE IF NOT EXISTS usuarios( 
@@ -16,6 +16,7 @@ CONSTRAINT pk_usuarios PRIMARY KEY(id),
 CONSTRAINT uq_email UNIQUE(email)  
 )ENGINE=InnoDb DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+Alter table usuarios add column token varchar(255);
 
 DROP TABLE IF EXISTS categorias;
 CREATE TABLE IF NOT EXISTS categorias(

@@ -20,14 +20,16 @@ class UserRepository
     $email = $user->getEmail();
     $password = $user->getPassword();
     $rol = $user->getRol();
+    $token = $user->getToken();
 
-    $stmt = $this->db->prepare('INSERT INTO usuarios (nombre, email, password, rol) VALUES (:nombre, :email, :password, :rol)');
+    $stmt = $this->db->prepare('INSERT INTO usuarios (nombre, email, password, rol,token) VALUES (:nombre, :email, :password, :rol , :token)');
     
     // Ahora pasamos las variables en lugar de los métodos directamente
     $stmt->bindParam(':nombre', $nombre);
     $stmt->bindParam(':email', $email);
     $stmt->bindParam(':password', $password);
     $stmt->bindParam(':rol', $rol);
+    $stmt->bindParam(':token', $token);
     
     $stmt->execute();
 }

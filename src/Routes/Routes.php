@@ -3,6 +3,7 @@
 namespace Routes;
 use Controllers\CategoryController;
 use Controllers\AuthController;
+use Controllers\PaymentController;
 use Controllers\ProductoController;
 use Lib\Router;  
 use Src\Controllers\ErrorController;
@@ -218,8 +219,8 @@ Router::add('GET', '/api/productos', function () {
 });
 
 // Obtener un producto por ID
-Router::add('GET', '/api/productos/{id}', function ($id) {
-    (new ProductoController())->getProductoById($id);
+Router::add('GET', '/api/productos/:id', function ($id) {
+    (new ProductoController())->getById($id);
 });
 
 // Crear un nuevo producto
@@ -228,13 +229,31 @@ Router::add('POST', '/api/producto', function () {
 });
 
 // Actualizar un producto por ID
-Router::add('PUT', '/api/productos/{id}', function ($id) {
+Router::add('PUT', '/api/productos/:id', function ($id) {
     (new ProductoController())->updateProducto($id);
 });
 
 // Eliminar un producto por ID
 
+Router::add('DELETE', '/api/productos/:id', function($id) {
+    return (new ProductoController())->delete($id);
+}); 
 
+Router::add('POST', '/checkout', function() {
+    return (new PaymentController())->checkout();
+});
+
+Router::add('GET', '/payment/success', function() {
+    return (new PaymentController())->success();
+});
+
+Router::add('GET', '/payment/cancel', function() {
+    return (new PaymentController())->cancel();
+});
+
+Router::add('GET', '/payment/completed', function() {
+    return (new PaymentController())->completed();
+});
 
 
 // ...existing code...

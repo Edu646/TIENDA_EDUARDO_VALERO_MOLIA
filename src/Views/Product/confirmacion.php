@@ -12,6 +12,9 @@
         <p>Recibirás un correo de confirmación con los detalles de tu pedido.</p>
         <p>Gracias por tu pedido. Tu número de pedido es: <?php echo htmlspecialchars($pedidoId); ?></p>
         <p>Se ha enviado un correo de confirmación a tu dirección de correo electrónico.</p>
+
+</form>
+
         <a class="btn-continuar" href="<?= BASE_URL ?>">⬅ Volver a la tienda</a>
     </div>
 </body>
