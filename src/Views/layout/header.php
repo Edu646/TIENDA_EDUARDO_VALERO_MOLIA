@@ -1,3 +1,16 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once(__DIR__ . '/../../../config/config.php'); 
+
+// Función para verificar si el usuario es administrador
+function esAdmin() {
+    return isset($_SESSION['user']) && $_SESSION['user']['rol'] === 'admin';
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -117,16 +130,13 @@
     <nav>
         <ul>
             <?php if (isset($_SESSION['user'])): ?>
-                <!-- Opciones para usuario autenticado -->
                 <li>Bienvenido, <strong><?= htmlspecialchars($_SESSION['user']['nombre']) ?></strong></li>
                 <li><a href="<?= BASE_URL ?>logout">Cerrar Sesión</a></li>
                 <li><a href="<?= BASE_URL ?>ver">Lista Categorías</a></li>
                 <li><a href="<?= BASE_URL ?>verP">Lista de Productos</a></li>
                 <li><a href="<?= BASE_URL ?>carrito">Carrito</a></li>
-                <li><a href="<?= BASE_URL ?>mis-pedidos">Lista-pedidos</a></li>
-
+                <li><a href="<?= BASE_URL ?>mis-pedidos">Lista de pedidos</a></li>
             <?php else: ?>
-                <!-- Opciones para usuarios no autenticados -->
                 <li><a href="<?= BASE_URL ?>">Inicio</a></li>
                 <li><a href="<?= BASE_URL ?>login">Iniciar Sesión</a></li>
                 <li><a href="<?= BASE_URL ?>register">Registrarse</a></li>
@@ -137,17 +147,16 @@
 </header>
 
 <div class="container">
-    <!-- Sección especial para administradores -->
-    <?php if (isset($_SESSION['user']) && $_SESSION['user']['rol'] === 'admin'): ?>
+    <?php if (esAdmin()): ?>
         <div class="admin-section">
             <h2>Panel de Administración</h2>
             <ul>
                 <li><a href="<?= BASE_URL ?>listus">Gestionar Usuarios</a></li>
                 <li><a href="<?= BASE_URL ?>CrearP">Gestionar Productos</a></li>
-                <li><a href="<?= BASE_URL ?>verP_admin">verProductos_admin</a></li>
+                <li><a href="<?= BASE_URL ?>verP_admin">Ver Productos Admin</a></li>
                 <li><a href="<?= BASE_URL ?>vista">Categorías</a></li>
-                <li><a href="<?= BASE_URL ?>adminCategorias">adminCategorias</a></li>
-                <li><a href="<?= BASE_URL ?>ver-detalle">adminPedidos</a></li>
+                <li><a href="<?= BASE_URL ?>adminCategorias">Administrar Categorías</a></li>
+                <li><a href="<?= BASE_URL ?>ver-detalle">Administrar Pedidos</a></li>
             </ul>
         </div>
     <?php endif; ?>

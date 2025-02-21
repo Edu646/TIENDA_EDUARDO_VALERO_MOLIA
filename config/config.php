@@ -2,9 +2,24 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-define('PAYPAL_CLIENT_ID', 'AcVXyAkPXUm-EmyHCFiRRv8yIoFScRCJuO1L-WhtSeV1-VVs2QXlqueg5nPv6pqdnAGnmXFq7G4uX4O_');
-define('PAYPAL_SECRET', 'EM1sWDEBUmY28wEgdlyz4ritaz-std8aY-XYdmdfP1evpMY_opPpmO9BMD9IsT9UE4cyRtSaddcePVQY');
-define('PAYPAL_MODE', 'sandbox'); 
+
+
+
+if (!defined('PAYPAL_CLIENT_ID')) {
+    define('PAYPAL_CLIENT_ID', 'AcXgwZ6m3HeyRPWGkcq-YEbPLkga9-5wuNVKP4FV iu8Pi7w3ec8Rf05mRIweVjnEjgdLkLn2klRqxmgA');
+}
+
+if (!defined('PAYPAL_SECRET')) {
+    define('PAYPAL_SECRET', 'EK0vl_h-mcx94tu9u4SLmo_LSA2l1f1PnzZvYtMe TvHzxyhM_pp9hCXTc138u9-BSW0v00Bg_FkzaYlA');
+}
+
+if (!defined('PAYPAL_MODE')) {
+    define('PAYPAL_MODE', 'sandbox'); // o 'live'
+}
+
+if (!defined('JWT_SECRET_KEY')) {
+    define('JWT_SECRET_KEY', 'Vq3p$z!J8m@XcL5dN2^wYk9T&B7oGfQh');
+}
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -13,7 +28,7 @@ if (!defined('BASE_URL')) {
     define("BASE_URL", "http://localhost/TiendaEduardo/");
 }
 
-define('JWT_SECRET_KEY', 'Vq3p$z!J8m@XcL5dN2^wYk9T&B7oGfQh');
+
 
 return [
     'smtp' => [

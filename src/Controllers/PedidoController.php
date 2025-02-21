@@ -22,31 +22,37 @@ class PedidoController
     }
 
     public function crearPedido()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $usuario_id = $_SESSION['user']['id'];
-            $usuario_email = $_SESSION['user']['email']; // Asegúrate de que el correo del usuario esté en la sesión
-            $provincia = $_POST['provincia'] ?? '';
-            $localidad = $_POST['localidad'] ?? '';
-            $direccion = $_POST['direccion'] ?? '';
+{
+    if (!isset($_SESSION['user'])) {
+        header('Location: ' . BASE_URL . 'login'); // Redirigir al registro si no hay usuario
+        exit;
+    }
 
-            if (!empty($provincia) && !empty($localidad) && !empty($direccion)) {
-                $pedidoId = $this->pedidoService->crearPedido($usuario_id, $provincia, $localidad, $direccion, $_SESSION['carrito']);
-                if ($pedidoId) {
-                    $this->enviarCorreoConfirmacion($usuario_email, $pedidoId, $_SESSION['carrito']); // Pasa el correo del usuario a la función
-                    unset($_SESSION['carrito']);
-                    $_SESSION['total_carrito'] = 0;
-                    $_SESSION['pedidoId'] = $pedidoId; // Guardar el ID del pedido en la sesión
-                    header('Location: ' . BASE_URL . 'confirmacion');
-                    exit;
-                }
-            } else {
-                $_SESSION['error'] = 'Todos los campos son obligatorios.';
-                header('Location: ' . BASE_URL . 'carrito');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $usuario_id = $_SESSION['user']['id'];
+        $usuario_email = $_SESSION['user']['email']; // Asegúrate de que el correo del usuario esté en la sesión
+        $provincia = $_POST['provincia'] ?? '';
+        $localidad = $_POST['localidad'] ?? '';
+        $direccion = $_POST['direccion'] ?? '';
+
+        if (!empty($provincia) && !empty($localidad) && !empty($direccion)) {
+            $pedidoId = $this->pedidoService->crearPedido($usuario_id, $provincia, $localidad, $direccion, $_SESSION['carrito']);
+            if ($pedidoId) {
+                $this->enviarCorreoConfirmacion($usuario_email, $pedidoId, $_SESSION['carrito']);
+                unset($_SESSION['carrito']);
+                $_SESSION['total_carrito'] = 0;
+                $_SESSION['pedidoId'] = $pedidoId;
+                header('Location: ' . BASE_URL . 'confirmacion');
                 exit;
             }
+        } else {
+            $_SESSION['error'] = 'Todos los campos son obligatorios.';
+            header('Location: ' . BASE_URL . 'carrito');
+            exit;
         }
     }
+}
+
 
     private function enviarCorreoConfirmacion(string $usuario_email, int $pedidoId, array $carrito)
     {
@@ -65,6 +71,8 @@ class PedidoController
             // Destinatarios
             $mail->setFrom($this->config['smtp']['from_email'], $this->config['smtp']['from_name']);
             $mail->addAddress($usuario_email); // Usa el correo del usuario
+
+            $mail->CharSet = 'UTF-8';
 
             // Contenido del correo
             $mail->isHTML(true);

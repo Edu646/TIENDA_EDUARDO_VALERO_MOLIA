@@ -25,6 +25,7 @@ class ProductoService {
  
     }
 
+
     public function deleteProducto($producto_id) {
         return $this->productoRepository->deleteProductoById($producto_id);
     }

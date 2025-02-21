@@ -157,7 +157,6 @@
                 <div class="total">
                     <strong>Total del Carrito: <?= number_format($_SESSION['total_carrito'], 2) ?> €</strong>
                 </div>
-                <button type="submit">Actualizar Cantidades</button>
             </form>
 
             <h2>Datos del Cliente</h2>

@@ -20,6 +20,19 @@ class Routes {
             $pages = new \Lib\Pages();
             $pages->render('inicio'); 
         });
+
+        
+
+
+
+        Router::add('GET', '/listus/', function () {
+            if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'admin') {
+                error_log("Acceso denegado a admin, redirigiendo a /error/");
+                return (new ErrorController())->error404();
+            }
+        
+        });
+        
         
         // Ruta para errores
         Router::add('GET', '/error/', function () {
@@ -141,10 +154,6 @@ class Routes {
         
         Router::add('GET', '/adminCategorias', function () {
             (new CategoryController())->adminCategorias();
-        });
-
-        Router::add('POST', '/actualizarCantidadCarrito', function () {
-            (new ProductoController())->actualizarCantidadCarrito();
         });
 
         Router::add('POST', '/disminuirCantidad', function () {

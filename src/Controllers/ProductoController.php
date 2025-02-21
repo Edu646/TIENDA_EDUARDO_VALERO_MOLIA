@@ -79,6 +79,13 @@ class ProductoController {
     public function verProductos() {
         $productos = $this->productoService->getAllProductos();
         $this->pages->render('Product/VerProductos', ['productos' => $productos]);
+       
+    }
+
+    public function verProductosini() {
+        $productos = $this->productoService->getAllProductos();
+        $this->pages->render('inicio', ['productos' => $productos]);
+       
     }
 
     public function verProductos_admin() {
@@ -100,7 +107,7 @@ class ProductoController {
     }
 
     public function agregarAlCarrito() {
-        session_start();
+    
     
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['producto_id'])) {
             $producto_id = $_POST['producto_id'];
